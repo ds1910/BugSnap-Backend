@@ -9,6 +9,7 @@ const isMember = (team, userId) => {
   return team.members.some((m) => m.user.toString() === userId);
 };
 
+/// hello
 // Helper: check admin
 const isAdmin = (team, userId) => {
   const member = team.members.find((m) => m.user.toString() === userId);
