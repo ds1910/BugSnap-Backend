@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BugSnap</title>
+
+    <style>
+      /* Reset & Base Styles */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(to right, #e0eafc, #cfdef3);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px;
+        color: #333;
+      }
+
+      /* Container Card */
+      .container {
+        background-color: #ffffff;
+        padding: 40px 50px;
+        border-radius: 16px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        max-width: 480px;
+        width: 100%;
+        transition: box-shadow 0.3s ease;
+      }
+
+      .container:hover {
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Heading */
+      h1 {
+        font-size: 2.2rem;
+        margin-bottom: 24px;
+        color: #2c3e50;
+        text-align: center;
+      }
+
+      /* Form Styling */
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      input[type="file"] {
+        padding: 12px;
+        border: 2px dashed #b0bec5;
+        border-radius: 10px;
+        background-color: #f7f9fb;
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+      }
+
+      input[type="file"]:hover,
+      input[type="file"]:focus {
+        border-color: #4a90e2;
+        background-color: #ecf3fb;
+        outline: none;
+      }
+
+      button {
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(90deg, #4a90e2, #357ab8);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+      button:hover {
+        background: linear-gradient(90deg, #357ab8, #2f6eb0);
+        transform: translateY(-2px);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      /* Footer Text */
+      .note {
+        font-size: 0.9rem;
+        color: #607d8b;
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 30px 20px;
+        }
+
+        h1 {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Upload Your Image</h1>
+
+      <!-- 
+      enctype="multipart/form-data" is required for uploading files.
+      It allows binary data (like images) to be sent in form submission.
+      Without it, file upload will not work.
+    -->
+      <form action="/media/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="profileImage" accept="image/*" required />
+        <button type="submit">Upload</button>
+      </form>
+      <!-- 
+    <form action="/media/upload" method="post" enctype="multipart/form-data">
+  <input type="file" name="profileImage" accept="image/*" required onchange="previewImage(event)" />
+  <br />
+  <img id="imagePreview" src="#" alt="Preview will appear here" style="display:none; max-width: 300px; margin-top: 10px;" />
+  <br />
+  <button type="submit">Upload</button>
+</form>
+
+-->
+
+      <p class="note">Only image files are accepted. Max size: 5MB.</p>
+    </div>
+  </body>
+  <!-- <script>
+  function previewImage(event) {
+    const fileInput = event.target;
+    const preview = document.getElementById("imagePreview");
+
+    const file = fileInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = "#";
+      preview.style.display = "none";
+    }
+  }
+</script> -->
+</html>
