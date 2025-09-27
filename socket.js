@@ -18,7 +18,7 @@
 
 //   // Main Connection Handler
 
-//   socket.on("connection", (socket) => {
+//   Socket.on("connection", (socket) => {
     
 //     socket.on("join_project", (projectId) => {
 //       socket.join(projectId);
@@ -35,4 +35,4 @@
 //   });
 // }
 
-// module.exports = intiSocketl;
+// module.exports = intiSocket;

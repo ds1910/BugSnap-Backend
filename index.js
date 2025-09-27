@@ -8,6 +8,7 @@ const cors = require("cors");
 const swaggerJS = require("swagger-jsdoc");
 const swaggerUI = require("swagger-ui-express");
 require("dotenv").config(); 
+// const intiSocket = require("./socket");
 
 // ==============================
 // Models & Utility Imports
@@ -37,6 +38,7 @@ const mediaRouter = require("./routes/media");
 const commentRouter = require("./routes/comment");
 const peopleRouter = require("./routes/people");
 const { title } = require("process");
+const { Socket } = require("dgram");
 
 
 // ==============================
@@ -121,6 +123,7 @@ const knowWhichRoute = (req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   next(); // important to pass control to the next middleware or route
 };
+
 app.use("/user", userRouter);               // Public: Signup, Login, Logout, Password Reset
 app.use("/auth", authRouter);               // Public: Google/GitHub OAuth
 app.use("/team",knowWhichRoute,checkAuthentication,teamRouter); // Protected: Team management routes
