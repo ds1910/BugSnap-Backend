@@ -17,18 +17,18 @@ const setTokenCookie = require("../utils/setTokenCookie");
  * - Called before any route logic
  * - Useful for request auditing or debugging
  */
-const logReqRes = (fileName) => {
-  return (req, res, next) => {
-    fs.appendFile(
-      fileName,
-      `\n${Date.now()} - ${req.method} - ${req.path}\n`,
-      (err) => {
-        if (err) console.error("Error logging request:", err);
-        next();
-      }
-    );
-  };
-};
+// const logReqRes = (fileName) => {
+//   return (req, res, next) => {
+//     fs.appendFile(
+//       fileName,
+//       `\n${Date.now()} - ${req.method} - ${req.path}\n`,
+//       (err) => {
+//         if (err) console.error("Error logging request:", err);
+//         next();
+//       }
+//     );
+//   };
+// };
 
 // ======================================================
 // ============= Auth Middleware (JWT) ==================
