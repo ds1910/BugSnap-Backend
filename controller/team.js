@@ -10,7 +10,7 @@ const isMember = (team, userId) => {
 };
 
 /// hello
-// Helper: check admin
+// Helper: check 
 const isAdmin = (team, userId) => {
   const member = team.members.find((m) => m.user.toString() === userId);
   return member && member.role === "admin";
