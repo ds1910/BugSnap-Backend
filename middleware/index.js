@@ -8,27 +8,7 @@ const {
 const User = require("../model/user");
 const setTokenCookie = require("../utils/setTokenCookie");
 
-// ======================================================
-// ========== Request Logging Middleware ================
-// ======================================================
 
-/**
- * Logs each request method and path to a specified file
- * - Called before any route logic
- * - Useful for request auditing or debugging
- */
-// const logReqRes = (fileName) => {
-//   return (req, res, next) => {
-//     fs.appendFile(
-//       fileName,
-//       `\n${Date.now()} - ${req.method} - ${req.path}\n`,
-//       (err) => {
-//         if (err) console.error("Error logging request:", err);
-//         next();
-//       }
-//     );
-//   };
-// };
 
 // ======================================================
 // ============= Auth Middleware (JWT) ==================
