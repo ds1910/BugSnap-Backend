@@ -8,6 +8,9 @@ const cors = require("cors");
 const swaggerJS = require("swagger-jsdoc");
 const swaggerUI = require("swagger-ui-express");
 require("dotenv").config(); 
+const FRONTEND_URL_MAIN = process.env.FRONTEND_URL_MAIN;
+
+
 // const intiSocket = require("./socket");
 
 // ==============================
@@ -55,7 +58,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:8019',
+        url: `${FRONTEND_URL_MAIN}`,
       },
     ],
   },
@@ -84,7 +87,7 @@ app.use(express.urlencoded({ extended: false })); // Parse application/x-www-for
 
 // CORS setup to allow frontend access (adjust origin in production)
 app.use(cors({
-  origin: "http://localhost:5173", // Frontend URL (change in production)
+  origin: `${FRONTEND_URL_MAIN}`, // Frontend URL (change in production)
   credentials: true               // Allow cookies to be sent
 }));
 
