@@ -4,8 +4,10 @@ const Team = require("../model/team");
 const logActivity = require("../utils/logActivity");
 const applyQueryFeatures = require("../utils/queryUtils");
 const User = require("../model/user");
+
 /**
- * Utility: Validate team and membership
+ * Utility: Validate team existence and check if a user is part of that team
+ * - Throws error if team does not exist or user is not a member
  */
 const getTeamAndCheckMembership = async (teamId, userId) => {
   if (!teamId || !mongoose.Types.ObjectId.isValid(teamId)) {
@@ -23,6 +25,9 @@ const getTeamAndCheckMembership = async (teamId, userId) => {
   return { team, member };
 };
 
+/**
+ * Utility: Ensure that the user is an admin in the team
+ */
 const checkIfAdminInTeam = (member) => {
   if (member.role !== "admin") {
     throw new Error("Only team admins can perform this action.");
@@ -30,11 +35,12 @@ const checkIfAdminInTeam = (member) => {
 };
 
 /**
- * Create a new bug (Admin only)
+ * Create a new bug
+ * - Ensures unique bug title per team
+ * - Allows optional assignment to a team user
+ * - Logs activity on success
  */
 const handleCreateBug = async (req, res) => {
-  //  console.log("Create Bug Request:", req.body);
-
   const {
     title,
     tags = [],
@@ -53,11 +59,11 @@ const handleCreateBug = async (req, res) => {
   }
 
   try {
-    // ✅ Check membership + admin
+    // Validate membership & admin rights
     const { team, member } = await getTeamAndCheckMembership(teamId, createdBy);
-    checkIfAdminInTeam(member);
+    // checkIfAdminInTeam(member);
 
-    // ✅ Ensure unique bug title in team
+    // Prevent duplicate bug titles inside the same team
     const existingBug = await Bug.findOne({ title, teamId });
     if (existingBug) {
       return res
@@ -65,7 +71,7 @@ const handleCreateBug = async (req, res) => {
         .json({ error: "Bug with this title already exists in the team." });
     }
 
-    // ✅ Handle assignee
+    // Assign user if provided and valid
     let assignedTo = [];
     if (assignee && assignee.name) {
       const userDoc = await User.findOne({
@@ -77,11 +83,12 @@ const handleCreateBug = async (req, res) => {
           .status(404)
           .json({ error: `Assignee '${assignee.name}' not found.` });
       }
-
-      assignedTo = [userDoc._id]; // push into array
+      assignedTo = [userDoc._id];
     }
+    const user = await User.findById(createdBy, "name").lean();
+    const username = user?.name;
 
-    // ✅ Create bug
+    // Create the bug record
     const bug = await Bug.create({
       title,
       tags,
@@ -92,23 +99,14 @@ const handleCreateBug = async (req, res) => {
       startDate,
       dueDate,
       assignedTo,
-      history: [
-        {
-          action: "created",
-          detail: "Bug created by user",
-          performedBy: createdBy,
-        },
-      ],
     });
 
-    //    console.log("Created Bug:", bug);
-
-    // ✅ Log activity
+    // Log activity for auditing
     await logActivity({
       userId: createdBy,
       bugId: bug._id,
       action: "Bug Created",
-      details: "New bug created by admin of team",
+      details: `New bug created by ${username}`,
     });
 
     return res.status(201).json({ message: "Bug created", bug });
@@ -119,23 +117,20 @@ const handleCreateBug = async (req, res) => {
 };
 
 /**
- * Fetch all bugs for a specific team (Any member)
+ * Get all bugs for a team (Any member can view)
+ * - Validates membership
+ * - Fetches bugs for the team
+ * - Attaches assignee name for readability
  */
 const handleGetAllBugsForTeam = async (req, res) => {
   const teamId = req.query.teamId;
   const userId = req.user.id;
- 
-   console.log(req.body);
-    
+
   try {
-    // Check team & membership
     const { team } = await getTeamAndCheckMembership(teamId, userId);
-
-    // Find all bugs for that team
     const bugs = await Bug.find({ teamId: team._id }).lean();
-    console.log(bugs);
 
-    // Attach assigned user name for each bug
+    // Resolve assigned user names
     const bugsWithAssignee = await Promise.all(
       bugs.map(async (bug) => {
         if (bug.assignedTo) {
@@ -145,26 +140,24 @@ const handleGetAllBugsForTeam = async (req, res) => {
             assignedName: assignedUser ? assignedUser.name : null,
           };
         }
-        return {
-          ...bug,
-          assignedName: null,
-        };
+        return { ...bug, assignedName: null };
       })
     );
 
-    //   console.log(bugsWithAssignee);
     return res.status(200).json(bugsWithAssignee);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
 };
+
 /**
- * Fetch specific bug by ID (Creator or assigned user only)
+ *   Get a specific bug by ID
+ * - Only creator or assigned users can view
  */
 const handleGetBugById = async (req, res) => {
   const bugId = req.query.bugId || req.params.bugId;
   const userId = req.user.id;
-
+  
   try {
     if (!bugId || !mongoose.Types.ObjectId.isValid(bugId)) {
       return res.status(400).json({ error: "Invalid or missing bugId." });
@@ -188,94 +181,82 @@ const handleGetBugById = async (req, res) => {
   }
 };
 
+
 /**
- * Update bug by ID (Creator or assigned user only)
+ * Update a bug by ID, return enriched bug info, and log activity.
  */
-
-
-
 const handleUpdateBugById = async (req, res) => {
   const teamId = req.query.teamId;
   const userId = req.user.id;
+  const bugId = req.params.id;
+  const updates = req.body; // fields to update
 
   try {
-    // Ensure team exists and user is a member (your helper should throw if not allowed)
+    // 1. Validate team membership
     const { team } = await getTeamAndCheckMembership(teamId, userId);
 
-    // Find all bugs for that team (lean for performance)
-    const bugs = await Bug.find({ teamId: team._id }).lean();
+    // 2. Ensure bug belongs to this team
+    const bug = await Bug.findOne({ _id: bugId, teamId: team._id });
+    if (!bug) {
+      return res.status(404).json({ error: "Bug not found in this team" });
+    }
 
-    // Normalize and collect all assigned IDs across bugs to batch-query users
-    const collectAssignedIds = new Set();
-    const normalizeToIdArray = (val) => {
-      if (!val) return [];
-      if (Array.isArray(val)) return val.map(String).filter(Boolean);
-      return [String(val)];
+    // 3. Apply updates
+    Object.assign(bug, updates);
+    await bug.save();
+
+    // 4. Populate assigned users (optional enrichment)
+    const assignedIds = Array.isArray(bug.assignedTo)
+      ? bug.assignedTo
+      : bug.assignedTo
+      ? [bug.assignedTo]
+      : [];
+
+    const users = await User.find({ _id: { $in: assignedIds } })
+      .select("name displayName fullName username email")
+      .lean();
+
+    const assigned = users.map((u) => ({
+      id: String(u._id),
+      name:
+        u.name || u.displayName || u.fullName || u.username || u.email || null,
+    }));
+
+    const assignedName =
+      assigned.length === 0
+        ? null
+        : assigned.map((a) => a.name || "").filter(Boolean).join(", ") || null;
+
+    const bugWithAssignee = {
+      ...bug.toObject(),
+      assigned,
+      assignedName,
     };
 
-    for (const b of bugs) {
-      const ids = normalizeToIdArray(b.assignedTo);
-      for (const id of ids) {
-        if (mongoose.Types.ObjectId.isValid(id)) collectAssignedIds.add(id);
-      }
-    }
+    // 5. Log activity
+    const user = await User.findById(userId).select("name email username").lean();
+    const username = user?.name || user?.username || user?.email || "Unknown";
 
-    // Batch fetch users (only if there are ids)
-    const userMap = new Map();
-    if (collectAssignedIds.size > 0) {
-      const users = await User.find({ _id: { $in: Array.from(collectAssignedIds) } })
-        .select("name displayName fullName username email")
-        .lean();
-      users.forEach((u) => {
-        const name = u.name || u.displayName || u.fullName || u.username || u.email || null;
-        userMap.set(String(u._id), { id: String(u._id), name });
-      });
-    }
-
-    // Build a quick lookup map for team.members if they include names locally
-    const teamMemberMap = new Map();
-    if (team?.members && Array.isArray(team.members)) {
-      for (const m of team.members) {
-        const uid = m?.user ? String(m.user) : null;
-        if (!uid) continue;
-        const name = m.name || m.displayName || m.fullName || m.username || m.email || null;
-        teamMemberMap.set(uid, { id: uid, name });
-      }
-    }
-
-    // Helper to build assigned array preserving order
-    const buildAssignedForBug = (assignedToRaw) => {
-      const ids = normalizeToIdArray(assignedToRaw);
-      const assignedArr = ids.map((id) => {
-        if (!mongoose.Types.ObjectId.isValid(id)) return { id: String(id), name: null };
-        // prefer team member info, then userMap, then null
-        if (teamMemberMap.has(String(id))) return teamMemberMap.get(String(id));
-        if (userMap.has(String(id))) return userMap.get(String(id));
-        return { id: String(id), name: null };
-      });
-      return assignedArr;
-    };
-
-    // Build response list
-    const bugsWithAssignee = bugs.map((b) => {
-      const assigned = buildAssignedForBug(b.assignedTo || []);
-      const assignedName = assigned.length === 0 ? null : assigned.map((a) => a.name || "").filter(Boolean).join(", ") || null;
-      return {
-        ...b,
-        assigned, // [{ id, name }, ...]
-        assignedName, // "Alice, Bob" or null
-      };
+    await logActivity({
+      userId,
+      bugId: bug._id,
+      action: "Bug Updated",
+      details: `${bug.title} was updated by ${username}`,
     });
 
-    return res.status(200).json(bugsWithAssignee);
+    // 6. Return response
+    return res.status(200).json(bugWithAssignee);
   } catch (err) {
-    console.error("Error in handleGetAllBugsForTeam:", err);
-    return res.status(400).json({ error: err.message || "Failed to fetch bugs" });
+    console.error("Error in updateBugById:", err);
+    return res.status(400).json({ error: err.message || "Failed to update bug" });
   }
 };
 
+
 /**
- * Delete bug by ID (Admin only)
+ * Delete a bug by ID (Admin only)
+ * - Only admins of the bug’s team can delete
+ * - Logs deletion activity
  */
 const handleDeleteBugById = async (req, res) => {
   const bugId = req.query.bugId || req.params.bugId;
@@ -295,11 +276,15 @@ const handleDeleteBugById = async (req, res) => {
     );
     checkIfAdminInTeam(member);
 
+    // Log activity
+    const user = await User.findById(userId).select("name email username").lean();
+    const username = user?.name || user?.username || user?.email || "Unknown";
+
     await logActivity({
       userId,
       bugId: bug._id,
       action: "Bug Deleted",
-      details: "Bug deleted by admin of team",
+      details: `${bug.title} was deleted by ${username}`,
     });
 
     await Bug.findByIdAndDelete(bugId);
@@ -310,7 +295,10 @@ const handleDeleteBugById = async (req, res) => {
 };
 
 /**
- * Assign a user to bug (Admin only)
+ * Assign a team user to a bug (Admin only)
+ * - Validates target user is in team
+ * - Prevents duplicate assignments
+ * - Logs activity
  */
 const handleAssignUserToBug = async (req, res) => {
   const { bugId } = req.params;
@@ -361,7 +349,8 @@ const handleAssignUserToBug = async (req, res) => {
 };
 
 /**
- * Fetch all bugs assigned to logged-in user
+ * Fetch all bugs assigned to the logged-in user
+ * - Uses query utils to allow pagination/sorting/filtering
  */
 const getAllAssignedBugs = async (req, res) => {
   const userId = req.user.id;

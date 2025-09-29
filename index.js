@@ -24,7 +24,7 @@ const connectMongoDb = require("./connection");
 // ==============================
 // Middlewares
 // ==============================
-const { logReqRes, checkAuthentication, restrictTo } = require("./middleware"); // Logging, auth checks
+const { checkAuthentication, restrictTo } = require("./middleware"); // Logging, auth checks
 const { checkTeamMembership,checkTeamAdmin,checkBugTeamMatch} = require("./middleware/teamMiddleware");
 const isError = require("./middleware/error"); // Global error handler
 
@@ -95,16 +95,16 @@ app.use(cors({
 
 // ==============================
 // View Engine Setup (Optional HTML Rendering)
-// ==============================
-app.set("view engine", "ejs");
-app.set("views", path.resolve("./view")); // Set views directory
+// // ==============================
+// app.set("view engine", "ejs");
+// app.set("views", path.resolve("./view")); // Set views directory
 
 
 
 // ==============================
 // Request Logging Middleware
 // ==============================
-app.use(logReqRes("log.txt")); // Log all requests/responses to log.txt
+// app.use(logReqRes("log.txt")); // Log all requests/responses to log.txt
 
 
 
@@ -121,19 +121,19 @@ connectMongoDb("mongodb://127.0.0.1:27017/BugSnap")
 // Public and Protected Routes
 // ==============================
 
-const knowWhichRoute = (req, res, next) => {
-  console.log("In knowWhichRoute middleware");
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next(); // important to pass control to the next middleware or route
-};
+// const knowWhichRoute = (req, res, next) => {
+//   console.log("In knowWhichRoute middleware");
+//   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+//   next(); // important to pass control to the next middleware or route
+// };
 
 app.use("/user", userRouter);               // Public: Signup, Login, Logout, Password Reset
 app.use("/auth", authRouter);               // Public: Google/GitHub OAuth
-app.use("/team",knowWhichRoute,checkAuthentication,teamRouter); // Protected: Team management routes
-app.use("/bug",knowWhichRoute,checkAuthentication, bugRouter); // Protected: Bug tracking routes 
+app.use("/team",checkAuthentication,teamRouter); // Protected: Team management routes
+app.use("/bug",checkAuthentication, bugRouter); // Protected: Bug tracking routes 
 app.use("/media", checkAuthentication, mediaRouter);
-app.use("/comment",checkAuthentication,knowWhichRoute,commentRouter);
-app.use("/people",knowWhichRoute,checkAuthentication,knowWhichRoute,peopleRouter);
+app.use("/comment",checkAuthentication,commentRouter);
+app.use("/people",checkAuthentication,peopleRouter);
 
 
 

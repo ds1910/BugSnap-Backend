@@ -104,7 +104,6 @@ const restrictTo = (roles = []) => {
 // ======================================================
 
 module.exports = {
-  logReqRes,
   checkAuthentication,
   restrictTo,
 };

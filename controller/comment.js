@@ -2,6 +2,8 @@ const Bug = require("../model/bug");
 const mongoose = require("mongoose");
 const Team = require("../model/team");
 const Comment = require("../model/comment");
+const User = require("../model/user");
+const logActivity = require("../utils/logActivity");
 
 const createComment = async (req, res) => {
   const { text, bugId, teamId } = req.body;
@@ -36,6 +38,18 @@ const createComment = async (req, res) => {
       teamId,
       createdBy: userId,
       parentComment: null,
+    });
+
+    const user = await User.findById(userId)
+      .select("name email username")
+      .lean();
+    const username = user?.name || user?.username || user?.email || "Unknown";
+
+    await logActivity({
+      userId,
+      bugId: bug._id,
+      action: "Comment Created",
+      details: `$Comment is created by ${username} in ${bug.title}`,
     });
 
     return res.status(201).json({
@@ -208,14 +222,32 @@ const updateCommentById = async (req, res) => {
       });
     }
 
-    // Update and return the new comment (populate createdBy for client convenience)
+    // Update comment text
     comment.text = filteredData.text;
     await comment.save();
 
+    // Populate createdBy for client convenience
     const updatedComment = await Comment.findById(commentId).populate(
       "createdBy",
       "name email"
     );
+
+    // Get bug info from request body if sent
+    const bug = updatedData.bug || null;
+    const user = await User.findById(userId)
+      .select("name email username")
+      .lean();
+    const username = user?.name || user?.username || user?.email || "Unknown";
+
+    // Log activity if bug exists
+    if (bug && bug.title && bug._id) {
+      await logActivity({
+        userId,
+        bugId: bug._id,
+        action: "Comment Updated",
+        details: `Comment is updated by ${username} in ${bug.title}`,
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -234,11 +266,10 @@ const updateCommentById = async (req, res) => {
 
 // DELETE /comment/:commentId
 const deleteCommentById = async (req, res) => {
-   console.log("in deleteCommentById");
+  console.log("in deleteCommentById");
   const { commentId } = req.params;
   const user = req.user;
   const userId = user && (user.id || user._id);
-
 
   if (!mongoose.Types.ObjectId.isValid(commentId)) {
     return res
@@ -252,7 +283,6 @@ const deleteCommentById = async (req, res) => {
   }
 
   try {
-   
     const existing = await Comment.findById(commentId).lean();
     if (!existing) {
       return res
@@ -279,7 +309,6 @@ const deleteCommentById = async (req, res) => {
         data: deletedComment,
       });
     }
-
   } catch (error) {
     console.error("Error deleting comment:", error);
     return res.status(500).json({
@@ -289,7 +318,6 @@ const deleteCommentById = async (req, res) => {
     });
   }
 };
-
 
 const createReplyToComment = async (req, res) => {
   try {
@@ -317,6 +345,23 @@ const createReplyToComment = async (req, res) => {
       createdBy: userId,
       parentComment: parentId,
     });
+
+    const parentComment = await Comment.findById(parentId).lean();
+    const bug = await Bug.findById(bugId);
+    const user = await User.findById(userId)
+      .select("name email username")
+      .lean();
+    const username = user?.name || user?.username || user?.email || "Unknown";
+
+    // Only log if parentComment and bug exist
+    if (parentComment && bug && bug.title && bug._id) {
+      await logActivity({
+        userId,
+        bugId: bug._id, // use the actual bug document ID
+        action: "Reply Created",
+        details: `${username} replied to "${parentComment.text}" in "${bug.title}"`,
+      });
+    }
 
     return res.status(201).json({
       message: "Reply added successfully",
@@ -359,12 +404,10 @@ const getRepliesForComment = async (req, res) => {
 
     // Ensure we are fetching replies to a root-level comment
     if (parent.parentComment) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Replies to replies are not supported.",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "Replies to replies are not supported.",
+      });
     }
 
     // Optional: validate bugId if provided
@@ -486,21 +529,17 @@ const updateReply = async (req, res) => {
 
         // reply exists — check if parent matches
         if (String(existingReply.parentComment) !== String(parentId)) {
-          return res
-            .status(400)
-            .json({
-              success: false,
-              error: "Reply does not belong to the provided parentId",
-            });
+          return res.status(400).json({
+            success: false,
+            error: "Reply does not belong to the provided parentId",
+          });
         }
 
         // reply exists and parent matches but user didn't own it
-        return res
-          .status(403)
-          .json({
-            success: false,
-            error: "You are not authorized to update this reply.",
-          });
+        return res.status(403).json({
+          success: false,
+          error: "You are not authorized to update this reply.",
+        });
       }
 
       return res.status(200).json({
@@ -525,10 +564,6 @@ const updateReply = async (req, res) => {
   }
 };
 
-
-
-
-
 const deleteReply = async (req, res) => {
   console.log(req.body);
   try {
@@ -539,19 +574,17 @@ const deleteReply = async (req, res) => {
     }
     const userId = String(user.id || user._id).trim();
 
-    
     const { replyId } = req.body || {};
     if (!replyId) {
       return res.status(400).json({ error: "Missing required field: replyId" });
     }
     const replyIdStr = String(replyId).trim();
 
-
     if (!mongoose.Types.ObjectId.isValid(replyIdStr)) {
       return res.status(400).json({ error: "Invalid replyId" });
     }
-    
-    console.log("replystr: "+replyIdStr);
+
+    console.log("replystr: " + replyIdStr);
     const replyDoc = await Comment.findById(replyIdStr).lean();
 
     console.log(replyDoc);
@@ -577,17 +610,10 @@ const deleteReply = async (req, res) => {
         replyId: replyIdStr,
       });
     }
-
   } catch (err) {
     return res.status(500).json({ error: err.message || "Server error" });
   }
 };
-
-
-
-
-
-
 
 module.exports = {
   createComment,
