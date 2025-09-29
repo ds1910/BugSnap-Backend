@@ -89,9 +89,9 @@ const handleGoogleLoginCallBack = async (req, res) => {
     });
 
 
-    // If you try to pass raw strings (like names, emails) in a URL, certain characters can break the URL or cause errors.
-    const encodedName = encodeURIComponent(user.name);
-    const encodedEmail = encodeURIComponent(user.email);
+    // // If you try to pass raw strings (like names, emails) in a URL, certain characters can break the URL or cause errors.
+    // const encodedName = encodeURIComponent(user.name);
+    // const encodedEmail = encodeURIComponent(user.email);
 
     const encrypted = encrypt(userData); 
     // console.log("encrypted data", encrypted);
