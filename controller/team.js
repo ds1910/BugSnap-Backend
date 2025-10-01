@@ -83,10 +83,11 @@ const getTeamMembers = async (req, res) => {
         .json({ error: "You must be a team member to view members." });
     }
 
-    // Extract only name, email, role
+    // Extract name, email, role, and _id for unique identification
     let members = team.members.map((m) => ({
+      _id: m.user._id,  // Add unique ID for proper identification
       name: m.user.name,
-      email: m.user.email,
+      email: m.user.email || '', // Ensure email is always a string (even if empty)
       role: m.role,
     }));
 

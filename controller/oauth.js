@@ -3,6 +3,7 @@ const qs = require("qs"); // Required for form-urlencoded data
 const User = require("../model/user");
 const encrypt = require("../service/encrypt");
 const setTokenCookie = require("../utils/setTokenCookie");
+const { autoAcceptInvitations } = require("./people");
 
 const GOOGLE_CLIENT_ID = process.env.Google_Clinet_Id;
 const GOOGLE_CLIENT_SECRET = process.env.Google_Clinet_Secret;
@@ -69,8 +70,21 @@ const handleGoogleLoginCallBack = async (req, res) => {
 
     // Check if user exists, else create
     let user = await User.findOne({ email });
+    let isNewUser = false;
     if (!user) {
       user = await User.create({ name, email, image: picture });
+      isNewUser = true;
+      console.log(`Created new user: ${name} (${email})`);
+    }
+
+    // Auto-accept any pending invitations for this email
+    let acceptedCount = 0;
+    if (isNewUser) {
+      console.log(`Checking for pending invitations for new user: ${email}`);
+      acceptedCount = await autoAcceptInvitations(email, user._id);
+      if (acceptedCount > 0) {
+        console.log(`Auto-accepted ${acceptedCount} invitations for ${email}`);
+      }
     }
 
     // Generate JWT tokens
@@ -97,7 +111,15 @@ const handleGoogleLoginCallBack = async (req, res) => {
     // console.log("encrypted data", encrypted);
     console.log("in google login callback", userData);
     // console.log("FRONTEND_URL_MAIN: "+FRONTEND_URL_MAIN);
-   res.redirect(`${FRONTEND_URL_MAIN}dashboard/?data=${encodeURIComponent(encrypted)}`);
+    
+    // Add inviteAccepted parameter if this was a new user with auto-accepted invitations
+    let redirectUrl = `${FRONTEND_URL_MAIN}/dashboard/?data=${encodeURIComponent(encrypted)}`;
+    if (isNewUser && acceptedCount > 0) {
+      redirectUrl += `&inviteAccepted=true`;
+      console.log(`Redirecting with inviteAccepted=true (${acceptedCount} invitations auto-accepted)`);
+    }
+    
+   res.redirect(redirectUrl);
 
    
   } catch (error) {
@@ -111,7 +133,7 @@ const handleGitHubLogin = (req, res) => {
   const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 
   // GitHub will redirect the user to this callback after login
-  const redirectUri = "http://localhost:8019/auth/github/callback";
+  const redirectUri = process.env.GITHUB_REDIRECT_URI;
 
   // GitHub OAuth URL with client ID, redirect URI, and scope for email access
   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&scope=user:email`;

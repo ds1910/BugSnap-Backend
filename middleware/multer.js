@@ -6,15 +6,33 @@ const path = require("path");
 // ==========================================================
 
 /**
- * File filter to allow only image uploads
- * - Accepts files with MIME type(Multipurpose Internet Mail Extensions type, is a standard way to identify the format of a file) starting with "image/"
- * - Rejects others with an error
+ * File filter to allow common file types for bug attachments
+ * - Accepts images, documents, and common file formats
+ * - Rejects potentially dangerous file types
  */
 const fileFilter = (req, file, cb) => {
+  // Allow images
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
-  } else {
-    cb(new Error("Only image files are allowed!"), false);
+  }
+  // Allow documents
+  else if (file.mimetype === "application/pdf" ||
+           file.mimetype === "application/msword" ||
+           file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+           file.mimetype === "application/vnd.ms-excel" ||
+           file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+           file.mimetype === "text/plain" ||
+           file.mimetype === "text/csv") {
+    cb(null, true);
+  }
+  // Allow archives
+  else if (file.mimetype === "application/zip" ||
+           file.mimetype === "application/x-rar-compressed" ||
+           file.mimetype === "application/x-7z-compressed") {
+    cb(null, true);
+  }
+  else {
+    cb(new Error("File type not allowed. Please upload images, documents, or archives."), false);
   }
 };
 

@@ -6,6 +6,7 @@ const restToken = require("../model/resetToken");
 const setTokenCookie = require("../utils/setTokenCookie");
 const encrypt = require("../service/encrypt");
 const FRONTEND_URL_MAIN = process.env.FRONTEND_URL_MAIN;
+const BACKEND_URL_MAIN = process.env.BACKEND_URL_MAIN;
 const {transporter} = require("./nodemailerConfig");;
 const {
   generateAccessToken,
@@ -169,14 +170,12 @@ const handleUserSignup = async (req, res) => {
   // const encodedEmail = encodeURIComponent(user.email);
 
   const userData = JSON.stringify({ name: name, email: email }); 
-  const encrypted = encrypt(userData);
- //   console.log("User data to encrypt:", userData);
+ // const encrypted = encrypt(userData);
+  console.log("User data to encrypt:", userData);
    // Instead of res.redirect
   return res.status(200).json({
     message: "SignUp successful",
-    accessToken,
-    refreshToken,
-    encrypted
+    userData
   });
   } catch (error) {
     console.error("Signup error:", error);
@@ -198,49 +197,46 @@ const handleUserSignup = async (req, res) => {
  * - Supports both API and HTML form login
  */
 const handleUserLogin = async (req, res) => {
-  const { email, password } = req.body;
-   
-  const user = await USER.findOne({ email });
- console.log("User found for login:", user);
-  if (!user) {
-    const msg = "Invalid email";
-    return req.is("application/json")
-      ? res.status(401).json({ error: msg })
-      : res.render("login", { error: msg });
+  try {
+    const { email, password } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+
+    const user = await USER.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid email" });
+    }
+
+    if (!user.password) {
+      return res.status(400).json({ error: "This account has no password. Please login via OAuth." });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid password" });
+    }
+
+    const accessToken = generateAccessToken({ id: user._id });
+    const refreshToken = generateRefreshToken({ id: user._id });
+
+    setTokenCookie(res, { accessToken, refreshToken });
+
+    const userData = JSON.stringify({ name: user.name, email: user.email });
+    const encrypted = encrypt(userData);
+
+    return res.status(200).json({
+      message: "Login successful",
+      encrypted
+    });
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
-
-  const isMatch = await user.comparePassword(password);
- // console.log("Password match:", isMatch);
-  if (!isMatch) {
-    const msg = "Invalid password";
-    return req.is("application/json")
-      ? res.status(401).json({ error: msg })
-      : res.render("login", { error: msg });
-  } 
-
- // console.log("User authenticated:", user.email);
-
-  // Generate JWT tokens
-  const accessToken = generateAccessToken({ id: user._id });
-  const refreshToken = generateRefreshToken({ id: user._id });
-
-  // Set tokens in cookies
-  setTokenCookie(res, { accessToken, refreshToken });
-  const encodedName = encodeURIComponent(user.name);
-  const encodedEmail = encodeURIComponent(user.email);
-
-  const userData = JSON.stringify({ name: user.name, email: user.email }); 
-  const encrypted = encrypt(userData);
- //   console.log("User data to encrypt:", userData);
-   // Instead of res.redirect
-  return res.status(200).json({
-    message: "Login successful",
-    accessToken,
-    refreshToken,
-    encrypted
-  });
-
 };
+
 
 // ==========================================================
 // =============== Send Reset Link Email ====================
@@ -292,9 +288,11 @@ const sendEmail = async ({ to, resetLink }) => {
 const handelForgotPassword = async (req, res) => {
   const { email } = req.body;
 
+   
   // Check if email exists in DB
   const user = await USER.findOne({ email });
 
+  console.log("User found for password reset:", user);
   if (!user) {
     if (req.is("application/json")) {
       return res.status(401).json({ error: "Invalid email" });
@@ -314,7 +312,7 @@ const handelForgotPassword = async (req, res) => {
     resetTokenExpiry: new Date(Date.now() + 15 * 60 * 1000), // 15 mins expiry
   });
 
-  const resetLink = `http://localhost:${process.env.PORT}/user/resetPassword?token=${token}`;
+  const resetLink = `${FRONTEND_URL_MAIN}/resetPassword?token=${token}`;
 
   await sendEmail({ to: email, resetLink });
 
@@ -327,47 +325,53 @@ const handelForgotPassword = async (req, res) => {
 // ===========================================================
 
 const handleResetPassword = async (req, res) => {
-  const token = req.body.token;
-  const { newPassword } = req.body;
+  try {
+    const { token, newPassword } = req.body;
 
-  // console.log(token);
-  // console.log("newpasswrd: ", newPassword);
-  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    // Basic validation
+    if (!token) {
+      return res.status(400).json({ message: "Missing token" });
+    }
+    if (!newPassword || typeof newPassword !== "string" || newPassword.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
+    }
 
-  // resetToken model used
-  const tokenEntry = await restToken.findOne({
-    resetToken: hashedToken,
-    resetTokenExpiry: { $gt: Date.now() },
-  });
+    // Hash incoming token for safe DB comparison
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-  //'//console.log("token searching done");
-  // no token found
-  if (!tokenEntry) {
-    return res.status(400).json({ message: "Invalid or expired token" });
+    // Find matching, non-expired token entry
+    const tokenEntry = await restToken.findOne({
+      resetToken: hashedToken,
+      resetTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!tokenEntry) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Find the user by the email stored on the token doc
+    const user = await USER.findOne({ email: tokenEntry.email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Hash the new password and save it
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    user.password = hashedPassword;
+    await user.save();
+
+    // Invalidate all reset tokens for this email (single-use)
+    await restToken.deleteMany({ email: tokenEntry.email });
+
+    // Return JSON success response (no redirects)
+    return res.status(200).json({ message: "Password reset successful" });
+  } catch (err) {
+    console.error("handleResetPassword error:", err);
+    return res.status(500).json({ message: "Server error" });
   }
-
-  // Now find the actual user
-  const user = await USER.findOne({ email: tokenEntry.email });
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
-  // Update password securely
-  // console.log("New Password:", newPassword);
-  user.password = newPassword;
-  await user.save();
-
-  // Cleanup the token entry
-  await restToken.deleteOne({ resetToken: hashedToken });
-
-  if (req.is("application/json")) {
-    return res.status(201).json({ message: "Password reset successful" });
-  } else {
-    return res.redirect("/user/login");
-  }
-
-  // return res.status(200).json({ message: "" });
 };
+
 
 // ==========================================
 // ================ Logout ==================
@@ -382,32 +386,42 @@ const handleLogout = (req, res) => {
   res.status(200).json({ message: "Logged out" });
 };
 
-// ==========================================
-// ============ Render Views ================
-// ==========================================
 
 /**
- * Renders signup form page
+ * Get current user info and tokens
+ * - Used for OAuth users to get tokens for localStorage
  */
-const handleGetSignup = (req, res) => {
-  return res.render("signup");
+const getCurrentUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    const user = await USER.findById(userId).select('-password -__v');
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Generate fresh tokens
+    const accessToken = generateAccessToken({ id: user._id });
+    const refreshToken = generateRefreshToken({ id: user._id });
+
+    // Also update cookies with fresh tokens
+    setTokenCookie(res, { accessToken, refreshToken });
+
+    return res.status(200).json({
+      message: "User info retrieved successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        image: user.image
+      }
+    });
+  } catch (err) {
+    console.error("Get current user error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-/**
- * Renders login form page
- */
-const handleGetLogin = (req, res) => {
-  return res.render("login");
-};
-
-/**
- * Renders login form page
- */
-const handleGetResetPassword = (req, res) => {
-  const { token } = req.query;
-  // console.log("token form get fun: "+token);
-  res.render("resetpassword", { token });
-};
 
 // ==========================================
 // ============ Module Exports ==============
@@ -415,10 +429,8 @@ const handleGetResetPassword = (req, res) => {
 module.exports = {
   handleUserSignup,
   handleUserLogin,
-  handleGetSignup,
-  handleGetLogin,
   handleLogout,
   handelForgotPassword,
   handleResetPassword,
-  handleGetResetPassword,
+  getCurrentUser,
 };

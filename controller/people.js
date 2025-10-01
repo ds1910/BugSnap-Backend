@@ -331,12 +331,16 @@
 
       if (!currentUser.friends.includes(inviterId)) {
         currentUser.friends.push(inviterId);
+        console.log("Added inviter to current user's friends. Current user friends:", currentUser.friends);
       }
       if (!inviter.friends.includes(currId)) {
         inviter.friends.push(currId);
+        console.log("Added current user to inviter's friends. Inviter friends:", inviter.friends);
       }
       await currentUser.save();
       await inviter.save();
+      
+      console.log("Both users saved successfully");
 
       inviteDoc.used = true;
       inviteDoc.usedAt = new Date();
@@ -344,6 +348,7 @@
 
       return res.status(200).json({
         message: "Friend added successfully.",
+        refreshPeople: true, // Signal frontend to refresh people list
         friend: {
           id: inviter._id,
           name: inviter.name,
@@ -357,6 +362,91 @@
   };
 
   // ==============================
+  // AUTO ACCEPT INVITATIONS (helper function)
+  // ==============================
+  const autoAcceptInvitations = async (userEmail, userId) => {
+    try {
+      console.log(`\n=== Auto Accept Invitations for ${userEmail} ===`);
+      
+      // Find all unused invitation tokens for this email
+      const pendingInvites = await Invite.find({ 
+        used: false 
+      });
+      
+      console.log(`Found ${pendingInvites.length} total unused invites`);
+      
+      let acceptedCount = 0;
+      
+      for (const inviteDoc of pendingInvites) {
+        try {
+          // Decode the JWT token to check if it's for this user
+          const decoded = jwt.verify(inviteDoc.token, process.env.JWT_SECRET || "dev-secret");
+          const { invitedEmail, invitedBy } = decoded;
+          
+          if (invitedEmail === userEmail) {
+            console.log(`Processing invitation from ${invitedBy} to ${invitedEmail}`);
+            
+            // Find the inviter
+            const inviter = await User.findOne({ email: invitedBy });
+            if (!inviter) {
+              console.log(`Inviter ${invitedBy} not found, skipping`);
+              continue;
+            }
+            
+            // Find the current user
+            const currentUser = await User.findById(userId);
+            if (!currentUser) {
+              console.log(`Current user ${userId} not found, skipping`);
+              continue;
+            }
+            
+            const inviterId = inviter._id.toString();
+            const currId = currentUser._id.toString();
+            
+            // Add friends bidirectionally if not already friends
+            let updated = false;
+            if (!currentUser.friends.includes(inviterId)) {
+              currentUser.friends.push(inviterId);
+              console.log(`Added inviter ${inviter.name} to current user's friends`);
+              updated = true;
+            }
+            if (!inviter.friends.includes(currId)) {
+              inviter.friends.push(currId);
+              console.log(`Added current user ${currentUser.name} to inviter's friends`);
+              updated = true;
+            }
+            
+            if (updated) {
+              await currentUser.save();
+              await inviter.save();
+              
+              // Mark invitation as used
+              inviteDoc.used = true;
+              inviteDoc.usedAt = new Date();
+              await inviteDoc.save();
+              
+              acceptedCount++;
+              console.log(`Successfully auto-accepted invitation from ${inviter.name}`);
+            } else {
+              console.log(`Users ${currentUser.name} and ${inviter.name} are already friends`);
+            }
+          }
+        } catch (tokenError) {
+          // Skip invalid or expired tokens
+          console.log(`Skipping invalid token: ${tokenError.message}`);
+          continue;
+        }
+      }
+      
+      console.log(`Auto-accepted ${acceptedCount} invitations for ${userEmail}`);
+      return acceptedCount;
+    } catch (error) {
+      console.error("Error in autoAcceptInvitations:", error);
+      return 0;
+    }
+  };
+
+  // ==============================
   // Get All People
   // ==============================
   const handelGetAllPeople = async (req, res) => {
@@ -365,12 +455,15 @@
       if (!userId)
         return res.status(401).json({ success: false, message: "Unauthorized" });
 
+      console.log("\n=== Get All People Debug ===");
+      console.log("User ID:", userId);
+
       const user = await User.findById(userId).populate({
         path: "friends",
-        select: "name email teams bugs",
+        select: "name email teams bugs bio country city joinDate profilePic location",
         populate: [
           { path: "teams", select: "name" },
-          { path: "bugs" },
+          { path: "bugs", select: "title status" },
         ],
       });
 
@@ -379,15 +472,42 @@
           .status(404)
           .json({ success: false, message: "User not found" });
 
-      const people = (user.friends || []).map((f) => ({
+      console.log("User found:", { 
+        id: user._id,
+        email: user.email, 
+        name: user.name,
+        friendsCount: user.friends ? user.friends.length : 0
+      });
+      console.log("User friends (raw):", user.friends.map(f => ({
         id: f._id,
         name: f.name,
+        email: f.email
+      })));
+
+      const people = (user.friends || []).map((f) => ({
+        _id: f._id,
+        id: f._id,
+        name: f.name,
+        username: f.name, // For frontend compatibility
         email: f.email,
+        bio: f.bio,
+        country: f.country,
+        city: f.city,
+        joinDate: f.joinDate,
+        profilePic: f.profilePic,
+        location: f.location,
         teams: (f.teams || []).map((t) =>
           typeof t === "object" ? t.name : t
         ),
         bugs: f.bugs || [],
       }));
+
+      console.log("Formatted people to return:", people);
+      console.log("Response payload:", {
+        success: true,
+        count: people.length,
+        people
+      });
 
       return res.status(200).json({
         success: true,
@@ -683,6 +803,40 @@ const handelSendMessage = async (req, res) => {
 
 
 
+  // Test endpoint to debug friendships
+  const testFriendships = async (req, res) => {
+    try {
+      const { email } = req.query;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email parameter required" });
+      }
+      
+      const user = await User.findOne({ email }).populate('friends', 'name email');
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      return res.status(200).json({
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          friendsCount: user.friends.length,
+          friends: user.friends.map(f => ({
+            id: f._id,
+            name: f.name,
+            email: f.email
+          }))
+        }
+      });
+    } catch (error) {
+      console.error("Test friendships error:", error);
+      return res.status(500).json({ error: "Server error" });
+    }
+  };
+
   // ==============================
   module.exports = {
     handleInvitePeople,
@@ -690,4 +844,6 @@ const handelSendMessage = async (req, res) => {
     handelGetAllPeople,
     handelDeletePerson,
     handelSendMessage,
+    testFriendships,
+    autoAcceptInvitations,
   };

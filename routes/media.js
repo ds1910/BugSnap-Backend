@@ -3,6 +3,9 @@ const {
   handelUploadToCloud,
   handelViewFromCloud,
   handelDownloadFromCloud,
+  uploadBugAttachment,
+  getBugAttachments,
+  deleteAttachment,
 } = require("../controller/file");
 
 const upload = require("../middleware/multer");
@@ -91,6 +94,79 @@ router.get("/view/:id", handelViewFromCloud);
  *         description: File not found
  */
 router.get("/download/:id", handelDownloadFromCloud);
+
+/**
+ * @swagger
+ * /file/bug/upload:
+ *   post:
+ *     summary: Upload attachment for a bug
+ *     tags: [File]
+ *     consumes:
+ *       - multipart/form-data
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               attachment:
+ *                 type: string
+ *                 format: binary
+ *               bugId:
+ *                 type: string
+ *                 description: ID of the bug to attach file to
+ *     responses:
+ *       200:
+ *         description: Bug attachment uploaded successfully
+ *       400:
+ *         description: Upload failed - missing file or bugId
+ */
+router.post("/bug/upload", upload.single("attachment"), uploadBugAttachment);
+
+/**
+ * @swagger
+ * /file/bug/{bugId}/attachments:
+ *   get:
+ *     summary: Get all attachments for a specific bug
+ *     tags: [File]
+ *     parameters:
+ *       - in: path
+ *         name: bugId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the bug to get attachments for
+ *     responses:
+ *       200:
+ *         description: Bug attachments retrieved successfully
+ *       404:
+ *         description: No attachments found
+ */
+router.get("/bug/:bugId/attachments", getBugAttachments);
+
+/**
+ * @swagger
+ * /media/attachment/{fileId}:
+ *   delete:
+ *     summary: Delete a file attachment
+ *     tags: [File]
+ *     parameters:
+ *       - in: path
+ *         name: fileId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the file to delete
+ *     responses:
+ *       200:
+ *         description: File deleted successfully
+ *       404:
+ *         description: File not found
+ *       403:
+ *         description: Not authorized to delete this file
+ */
+router.delete("/attachment/:fileId", deleteAttachment);
 
 /* ====================== EXPORT ROUTER ====================== */
 module.exports = router;

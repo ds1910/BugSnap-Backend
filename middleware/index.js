@@ -25,8 +25,18 @@ const setTokenCookie = require("../utils/setTokenCookie");
  * - Prefer frontend-based token renewal for SPA apps
  */
 const checkAuthentication = async (req, res, next) => {
-  const accessToken = req.cookies?.accessToken;
-  const refreshToken = req.cookies?.refreshToken;
+  // Check for token in cookies first, then in Authorization header
+  let accessToken = req.cookies?.accessToken;
+  let refreshToken = req.cookies?.refreshToken;
+  
+  // If no token in cookies, check Authorization header
+  if (!accessToken) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      accessToken = authHeader.substring(7); // Remove 'Bearer ' prefix
+    }
+  }
+  
   //  console.log("in middleware: Cookies:", req.cookies);
   // console.log("in middlware Access Token:", accessToken);
   // console.log("in middleware: Refresh Token:", refreshToken);
@@ -41,9 +51,8 @@ const checkAuthentication = async (req, res, next) => {
 
       // Set tokens in cookies
       setTokenCookie(res, { accessToken });
-     // console.log("user:", user); 
+ 
       req.user = user;
-   //   console.log("Access token was missing but renewed via refresh token");
       return next();
     } catch (err) {
       return res.status(403).json({ message: "Invalid refresh token. Please login again." });
@@ -53,7 +62,7 @@ const checkAuthentication = async (req, res, next) => {
   try {
     const decode = verifyAccessToken(accessToken);
     req.user = decode;
-     console.log("user:", decode);
+    // console.log("user:", decode);
     return next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {

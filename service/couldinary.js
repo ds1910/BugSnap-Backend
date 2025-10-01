@@ -21,19 +21,29 @@ cloudinary.config({
 // The secret is never exposed; only valid, time-limited URLs can access protected media.
 
 
-const uploadWithRetry = async (localFilePath) => {
+const uploadWithRetry = async (localFilePath, mimetype = 'image') => {
   const upload = async () => {
     try {
-      // Generate a unique public_id with .jpg extension
-      const uniquePublicId = `upload/${uuidv4()}.jpg`;
+      // Generate a unique public_id
+      const uniquePublicId = `upload/${uuidv4()}`;
       console.log("uniquePublicId: ", uniquePublicId);
 
-      const result = await cloudinary.uploader.upload(localFilePath, {
-        resource_type: "image",       // Upload as image
-        type: "authenticated",        // Require signed URL to access
-        public_id: uniquePublicId,    // Custom public_id path in Cloudinary
-        format: "jpg",                // Force image format to .jpg
-      });
+      // Determine resource type based on mimetype
+      let resourceType = "auto"; // Let Cloudinary auto-detect
+      let uploadOptions = {
+        public_id: uniquePublicId,
+        type: "upload",        // Public access - no signed URL needed
+      };
+
+      // For images, force jpg format
+      if (mimetype && mimetype.startsWith('image/')) {
+        uploadOptions.resource_type = "image";
+        uploadOptions.format = "jpg";
+      } else {
+        uploadOptions.resource_type = "raw"; // For non-image files
+      }
+
+      const result = await cloudinary.uploader.upload(localFilePath, uploadOptions);
 
       console.log("Uploaded to Cloudinary:", result);
 
@@ -70,21 +80,19 @@ const uploadWithRetry = async (localFilePath) => {
   }
 };
 
-// 🔐 Generate a signed private URL for accessing authenticated files
-function generateSignedUrl(publicId, resourceType = "jpg", type = "authenticated") {
-  const expiresAt = Math.floor(Date.now() / 1000) + 300; // 5 min expire
-
+// 🔐 Generate a public URL for accessing files
+function generatePublicUrl(publicId, resourceType = "image") {
   const options = {
-    type,
-    expires_at: expiresAt,
+    secure: true,
+    resource_type: resourceType
   };
 
-  console.log("Generated Cloudinary signed URL with:", { publicId, resourceType, options });
+  console.log("Generated Cloudinary public URL with:", { publicId, resourceType, options });
 
-  return cloudinary.utils.private_download_url(publicId, resourceType, options);
+  return cloudinary.utils.url(publicId, options);
 }
 
 module.exports = {
   uploadWithRetry,
-  generateSignedUrl,
+  generatePublicUrl,
 };

@@ -6,7 +6,12 @@ const algorithm = 'aes-256-cbc';
 
 // Secret key for encryption (32 bytes = 256 bits)
 // Must be a valid 64-character hex string in .env file
-const secretKey = Buffer.from(process.env.ENCRYPTION_SECRET_KEY, 'hex');
+const secretKey = process.env.ENCRYPTION_SECRET_KEY ? Buffer.from(process.env.ENCRYPTION_SECRET_KEY, 'hex') : null;
+
+if (!secretKey) {
+  console.error("ERROR: ENCRYPTION_SECRET_KEY not found in environment variables");
+  process.exit(1);
+}
 
 // ============================ Encryption Function ============================ //
 // Encrypts plain text and returns it in the format: iv:encrypted

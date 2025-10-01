@@ -3,13 +3,12 @@ const USER = require("../model/user"); // Optional if not used here
 const {
   handleUserSignup,
   handleUserLogin,
-  handleGetSignup,
-  handleGetLogin,
   handleLogout,
   handelForgotPassword,
   handleResetPassword,
-  handleGetResetPassword,
+  getCurrentUser,
 } = require("../controller/user");
+const { checkAuthentication } = require("../middleware");
 
 const router = express.Router();
 
@@ -48,8 +47,7 @@ const router = express.Router();
  *         description: Signup page served
  */
 router.route("/signup")
-  .post(handleUserSignup)
-  .get(handleGetSignup);
+  .post(handleUserSignup);
 
 /**
  * @swagger
@@ -82,8 +80,7 @@ router.route("/signup")
  *         description: Login page served
  */
 router.route("/login")
-  .post(handleUserLogin)
-  .get(handleGetLogin);
+  .post(handleUserLogin);
 
 /**
  * @swagger
@@ -165,8 +162,25 @@ router.route("/forgotPassword")
  *         description: Invalid token
  */
 router.route("/resetPassword")
-  .post(handleResetPassword)
-  .get(handleGetResetPassword);
+  .post(handleResetPassword);
+
+/**
+ * @swagger
+ * /user/me:
+ *   get:
+ *     summary: Get current user info and fresh tokens
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: User info and tokens retrieved successfully
+ *       401:
+ *         description: Authentication required
+ */
+router.route("/me")
+  .get(checkAuthentication, getCurrentUser);
 
 /* ====================== EXPORT ROUTER ====================== */
 module.exports = router;

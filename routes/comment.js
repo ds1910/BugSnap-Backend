@@ -17,14 +17,17 @@ const knowWhichRoute = (req, res, next) => {
   return next(); // important to pass control to the next middleware or route
 };
 
-const { checkBugTeamMatch } = require("../middleware/teamMiddleware");
+const { checkBugTeamMatch, checkTeamMembership } = require("../middleware/teamMiddleware");
 
 const router = express.Router();
 
+// Create comment - team membership checked in controller, but add middleware for consistency
 router.route("/create").post(createComment);
 
+// Get comments - requires bugId, team validation handled in controller
 router.route("/all").get(getCommentsForBug);
 
+// Reply operations - add team membership check via query
 router
   .route("/reply")
   .post(createReplyToComment)
@@ -32,10 +35,9 @@ router
   .patch(updateReply)
   .delete(deleteReply);
 
-// NOTE: fixed missing leading slash on "manage/:commentId"
+// Comment management operations - ensure user has access
 router
   .route("/manage/:commentId")
-  // optionally expose GET for fetching a single comment
   .get(getCommentById)
   .patch(updateCommentById)
   .delete(deleteCommentById);

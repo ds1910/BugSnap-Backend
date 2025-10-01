@@ -40,6 +40,22 @@ const createComment = async (req, res) => {
       parentComment: null,
     });
 
+    // Populate the user information for the response
+    const populatedComment = await Comment.findById(newComment._id)
+      .populate('createdBy', 'name email')
+      .lean();
+
+    // Format the response with proper author info
+    const commentWithAuthor = {
+      ...populatedComment,
+      id: populatedComment._id,
+      author: {
+        id: populatedComment.createdBy._id,
+        name: populatedComment.createdBy.name || "Unknown User",
+        email: populatedComment.createdBy.email || ""
+      }
+    };
+
     const user = await User.findById(userId)
       .select("name email username")
       .lean();
@@ -55,7 +71,7 @@ const createComment = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Comment created successfully",
-      comment: newComment,
+      comment: commentWithAuthor,
     });
   } catch (error) {
     console.error(error);
@@ -89,7 +105,7 @@ const getCommentsForBug = async (req, res) => {
       bugId: bugId,
       parentComment: null,
     })
-      .populate({ path: "createdBy", select: "name" })
+      .populate({ path: "createdBy", select: "name email" })
       .sort({ createdAt: -1 }); // optional: newest first
 
     // Optionally fetch reply counts for each top-level comment (non-blocking in parallel)
@@ -104,9 +120,10 @@ const getCommentsForBug = async (req, res) => {
       const author = userDoc
         ? {
             id: userDoc._id,
-            name: userDoc.name || "Unknown",
+            name: userDoc.name || "Unknown User",
+            email: userDoc.email || ""
           }
-        : { id: null, name: "Unknown" };
+        : { id: null, name: "Unknown User", email: "" };
 
       return {
         ...obj,
@@ -309,6 +326,52 @@ const deleteCommentById = async (req, res) => {
         data: deletedComment,
       });
     }
+
+    // If not the author, check if user has team-level permissions
+    // Get the bug to check team membership
+    const bug = await Bug.findById(existing.bugId).populate('team');
+    if (!bug) {
+      return res.status(404).json({ 
+        success: false, 
+        error: "Bug not found for comment" 
+      });
+    }
+
+    // Check if user is team member with admin privileges
+    const Team = require('../model/team');
+    const team = await Team.findById(bug.team);
+    
+    if (!team) {
+      return res.status(404).json({ 
+        success: false, 
+        error: "Team not found" 
+      });
+    }
+
+    // Check if user is team admin or owner
+    const isTeamAdmin = team.admin.includes(userId) || String(team.createdBy) === strUserId;
+    
+    if (isTeamAdmin) {
+      const deletedComment = await Comment.findOneAndDelete({
+        _id: commentId,
+      }).lean();
+
+      // Cascade delete replies (single level only)
+      await Comment.deleteMany({ parentComment: commentId });
+
+      return res.status(200).json({
+        success: true,
+        message: "Comment and its replies deleted successfully (admin)",
+        data: deletedComment,
+      });
+    }
+
+    // User is neither author nor team admin
+    return res.status(403).json({
+      success: false,
+      error: "Not authorized to delete this comment"
+    });
+
   } catch (error) {
     console.error("Error deleting comment:", error);
     return res.status(500).json({
@@ -346,6 +409,22 @@ const createReplyToComment = async (req, res) => {
       parentComment: parentId,
     });
 
+    // Populate the user information for the response
+    const populatedReply = await Comment.findById(reply._id)
+      .populate('createdBy', 'name email')
+      .lean();
+
+    // Format the response with proper author info
+    const replyWithAuthor = {
+      ...populatedReply,
+      id: populatedReply._id,
+      author: {
+        id: populatedReply.createdBy._id,
+        name: populatedReply.createdBy.name || "Unknown User",
+        email: populatedReply.createdBy.email || ""
+      }
+    };
+
     const parentComment = await Comment.findById(parentId).lean();
     const bug = await Bug.findById(bugId);
     const user = await User.findById(userId)
@@ -365,7 +444,7 @@ const createReplyToComment = async (req, res) => {
 
     return res.status(201).json({
       message: "Reply added successfully",
-      reply,
+      reply: replyWithAuthor,
     });
   } catch (error) {
     console.error("Error creating reply:", error);
@@ -437,11 +516,11 @@ const getRepliesForComment = async (req, res) => {
       const author = userDoc
         ? {
             id: userDoc._id,
-            name: userDoc.name || "Unknown",
-            email: userDoc.email || null,
+            name: userDoc.name || "Unknown User",
+            email: userDoc.email || "",
             role: userDoc.role || null,
           }
-        : { id: null, name: "Unknown", email: null, role: null };
+        : { id: null, name: "Unknown User", email: "", role: null };
 
       return {
         ...obj,
