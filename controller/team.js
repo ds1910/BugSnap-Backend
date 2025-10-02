@@ -103,6 +103,34 @@ const getTeamMembers = async (req, res) => {
   }
 };
 
+// ✅ Get all teams where current user is a member
+const getAllTeams = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required." });
+    }
+
+    // Find all teams where the user is a member
+    const teams = await Team.find({
+      "members.user": userId
+    })
+    .populate("members.user", "name email")
+    .populate("createdBy", "name email")
+    .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      teams: teams,
+      count: teams.length
+    });
+  } catch (error) {
+    console.error("Error getting all teams:", error);
+    return res.status(500).json({ error: "Failed to get teams." });
+  }
+};
+
 // ✅ Get teams where current user is a member
 const getTeamById = async (req, res) => {
   try {
@@ -376,6 +404,7 @@ const deleteTeam = async (req, res) => {
 
 module.exports = {
   createTeam,
+  getAllTeams,
   getTeamMembers,
   getTeamById,
   addMemberToTeam,

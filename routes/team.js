@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   createTeam,
+  getAllTeams,
   getTeamMembers,
   getTeamById,
   addMemberToTeam,
@@ -56,7 +57,7 @@ router.post("/create", createTeam);
  *       404:
  *         description: Team not found
  */
-router.get("/allTeam", getTeamById);
+router.get("/allTeam", getAllTeams);
 
 /**
  * @swagger
@@ -139,7 +140,7 @@ router.patch("/remove-member", removeMemberFromTeam);
  *       404:
  *         description: Team not found
  */
-router.post("/members", getTeamMembers);
+router.get("/members", getTeamMembers);
 
 /**
  * @swagger
