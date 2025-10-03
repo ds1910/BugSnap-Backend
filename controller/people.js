@@ -62,9 +62,9 @@
   const handleInvitePeople = async (req, res) => {
     try {
       if (!process.env.JWT_SECRET) {
-        console.warn(
-          "Warning: JWT_SECRET not set — falling back to insecure dev-secret."
-        );
+        // console.warn(
+        //   "Warning: JWT_SECRET not set — falling back to insecure dev-secret."
+        // );
       }
 
       const frontendBase = getFrontendBase(req);
@@ -83,7 +83,7 @@
         try {
           requestUserDoc = await User.findById(requesterId).lean().exec();
         } catch (err) {
-          console.warn("DB fetch user error:", err?.message ?? err);
+          // console.warn("DB fetch user error:", err?.message ?? err);
         }
       }
 
@@ -262,13 +262,13 @@
       });
       // console.log("result ke phle");
       const results = await Promise.all(sendPromises);
-      console.log(results);
+      // console.log(results);
       return res.status(200).json({
         message: "Invitations processed",
         results,
       });
     } catch (err) {
-      console.error("Invite error:", err);
+      // console.error("Invite error:", err);
       return res.status(500).json({ error: "Failed to send invitations" });
     }
   };
@@ -331,16 +331,16 @@
 
       if (!currentUser.friends.includes(inviterId)) {
         currentUser.friends.push(inviterId);
-        console.log("Added inviter to current user's friends. Current user friends:", currentUser.friends);
+        // console.log("Added inviter to current user's friends. Current user friends:", currentUser.friends);
       }
       if (!inviter.friends.includes(currId)) {
         inviter.friends.push(currId);
-        console.log("Added current user to inviter's friends. Inviter friends:", inviter.friends);
+        // console.log("Added current user to inviter's friends. Inviter friends:", inviter.friends);
       }
       await currentUser.save();
       await inviter.save();
       
-      console.log("Both users saved successfully");
+      // console.log("Both users saved successfully");
 
       inviteDoc.used = true;
       inviteDoc.usedAt = new Date();
@@ -356,7 +356,7 @@
         },
       });
     } catch (err) {
-      console.error("Add people error:", err);
+      // console.error("Add people error:", err);
       return res.status(500).json({ error: "Failed to add friend." });
     }
   };
@@ -366,14 +366,14 @@
   // ==============================
   const autoAcceptInvitations = async (userEmail, userId) => {
     try {
-      console.log(`\n=== Auto Accept Invitations for ${userEmail} ===`);
+      // console.log(`\n=== Auto Accept Invitations for ${userEmail} ===`);
       
       // Find all unused invitation tokens for this email
       const pendingInvites = await Invite.find({ 
         used: false 
       });
       
-      console.log(`Found ${pendingInvites.length} total unused invites`);
+      // console.log(`Found ${pendingInvites.length} total unused invites`);
       
       let acceptedCount = 0;
       
@@ -384,19 +384,19 @@
           const { invitedEmail, invitedBy } = decoded;
           
           if (invitedEmail === userEmail) {
-            console.log(`Processing invitation from ${invitedBy} to ${invitedEmail}`);
+    // console.log(`Processing invitation from ${invitedBy} to ${invitedEmail}`);
             
             // Find the inviter
             const inviter = await User.findOne({ email: invitedBy });
             if (!inviter) {
-              console.log(`Inviter ${invitedBy} not found, skipping`);
+    // console.log(`Inviter ${invitedBy} not found, skipping`);
               continue;
             }
             
             // Find the current user
             const currentUser = await User.findById(userId);
             if (!currentUser) {
-              console.log(`Current user ${userId} not found, skipping`);
+    // console.log(`Current user ${userId} not found, skipping`);
               continue;
             }
             
@@ -407,12 +407,12 @@
             let updated = false;
             if (!currentUser.friends.includes(inviterId)) {
               currentUser.friends.push(inviterId);
-              console.log(`Added inviter ${inviter.name} to current user's friends`);
+    // console.log(`Added inviter ${inviter.name} to current user's friends`);
               updated = true;
             }
             if (!inviter.friends.includes(currId)) {
               inviter.friends.push(currId);
-              console.log(`Added current user ${currentUser.name} to inviter's friends`);
+    // console.log(`Added current user ${currentUser.name} to inviter's friends`);
               updated = true;
             }
             
@@ -426,22 +426,22 @@
               await inviteDoc.save();
               
               acceptedCount++;
-              console.log(`Successfully auto-accepted invitation from ${inviter.name}`);
+    // console.log(`Successfully auto-accepted invitation from ${inviter.name}`);
             } else {
-              console.log(`Users ${currentUser.name} and ${inviter.name} are already friends`);
+    // console.log(`Users ${currentUser.name} and ${inviter.name} are already friends`);
             }
           }
         } catch (tokenError) {
           // Skip invalid or expired tokens
-          console.log(`Skipping invalid token: ${tokenError.message}`);
+    // console.log(`Skipping invalid token: ${tokenError.message}`);
           continue;
         }
       }
       
-      console.log(`Auto-accepted ${acceptedCount} invitations for ${userEmail}`);
+    // console.log(`Auto-accepted ${acceptedCount} invitations for ${userEmail}`);
       return acceptedCount;
     } catch (error) {
-      console.error("Error in autoAcceptInvitations:", error);
+    // console.error("Error in autoAcceptInvitations:", error);
       return 0;
     }
   };
@@ -455,8 +455,8 @@
       if (!userId)
         return res.status(401).json({ success: false, message: "Unauthorized" });
 
-      console.log("\n=== Get All People Debug ===");
-      console.log("User ID:", userId);
+      // console.log("\n=== Get All People Debug ===");
+      // console.log("User ID:", userId);
 
       const user = await User.findById(userId).populate({
         path: "friends",
@@ -472,17 +472,17 @@
           .status(404)
           .json({ success: false, message: "User not found" });
 
-      console.log("User found:", { 
-        id: user._id,
-        email: user.email, 
-        name: user.name,
-        friendsCount: user.friends ? user.friends.length : 0
-      });
-      console.log("User friends (raw):", user.friends.map(f => ({
-        id: f._id,
-        name: f.name,
-        email: f.email
-      })));
+    // console.log("User found:", { 
+    //   id: user._id,
+    //   email: user.email, 
+    //   name: user.name,
+    //   friendsCount: user.friends ? user.friends.length : 0
+    // });
+    // console.log("User friends (raw):", user.friends.map(f => ({
+    //   id: f._id,
+    //   name: f.name,
+    //   email: f.email
+    // })));
 
       const people = (user.friends || []).map((f) => ({
         _id: f._id,
@@ -502,12 +502,12 @@
         bugs: f.bugs || [],
       }));
 
-      console.log("Formatted people to return:", people);
-      console.log("Response payload:", {
-        success: true,
-        count: people.length,
-        people
-      });
+    // console.log("Formatted people to return:", people);
+    // console.log("Response payload:", {
+    //   success: true,
+    //   count: people.length,
+    //   people
+    // });
 
       return res.status(200).json({
         success: true,
@@ -515,7 +515,7 @@
         people,
       });
     } catch (error) {
-      console.error("Error fetching people details:", error);
+    // console.error("Error fetching people details:", error);
       return res
         .status(500)
         .json({ success: false, message: "Internal Server Error" });
@@ -588,7 +588,7 @@
         message: "Friend removed successfully.",
       });
     } catch (err) {
-      console.error("Error in handelDeletePerson:", err);
+    // console.error("Error in handelDeletePerson:", err);
       return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
   };
@@ -606,7 +606,7 @@
           fs.unlinkSync(f.path);
         }
       } catch (err) {
-        console.warn("Failed to delete file:", f?.path, err?.message || err);
+    // console.warn("Failed to delete file:", f?.path, err?.message || err);
       }
     });
   };
@@ -795,7 +795,7 @@ const handelSendMessage = async (req, res) => {
       messageId: info.messageId,
     });
   } catch (err) {
-    console.error("Error in handleSendMessage:", err);
+    // console.error("Error in handleSendMessage:", err);
     cleanupFiles(files);
     return res.status(500).json({ message: err.message || "Failed to send message" });
   }
@@ -832,7 +832,7 @@ const handelSendMessage = async (req, res) => {
         }
       });
     } catch (error) {
-      console.error("Test friendships error:", error);
+    // console.error("Test friendships error:", error);
       return res.status(500).json({ error: "Server error" });
     }
   };

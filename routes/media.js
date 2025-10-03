@@ -9,7 +9,7 @@ const {
 } = require("../controller/file");
 
 const upload = require("../middleware/multer");
-
+const cache = require("../middleware/redis");
 const router = express.Router();
 
 /**
@@ -72,7 +72,7 @@ router.post("/upload", upload.single("profileImage"), handelUploadToCloud);
  *       404:
  *         description: File not found
  */
-router.get("/view/:id", handelViewFromCloud);
+router.get("/view/:id",cache(600), handelViewFromCloud);
 
 /**
  * @swagger
@@ -93,7 +93,7 @@ router.get("/view/:id", handelViewFromCloud);
  *       404:
  *         description: File not found
  */
-router.get("/download/:id", handelDownloadFromCloud);
+router.get("/download/:id",cache(600), handelDownloadFromCloud);
 
 /**
  * @swagger
@@ -143,7 +143,7 @@ router.post("/bug/upload", upload.single("attachment"), uploadBugAttachment);
  *       404:
  *         description: No attachments found
  */
-router.get("/bug/:bugId/attachments", getBugAttachments);
+router.get("/bug/:bugId/attachments",cache(600), getBugAttachments);
 
 /**
  * @swagger

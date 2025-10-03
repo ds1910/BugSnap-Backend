@@ -41,7 +41,7 @@ const checkTeamMembership = (teamIdSource = 'params') => {
 
       req.team = team;
       req.teamMember = member;
-      console.log(`User ${userId} is a member of team ${teamId} with role ${member.role}`);
+      // console.log(`User ${userId} is a member of team ${teamId} with role ${member.role}`);
       next();
     } catch (err) {
       next(err);
@@ -75,7 +75,7 @@ const checkTeamAdmin = async (req, res, next) => {
     if (member.role !== 'admin') {
       return res.status(403).json({ message: "Only team admins can perform this action." });
     }
-   console.log(`User ${userId} is an admin of team ${teamId}`);
+   // console.log(`User ${userId} is an admin of team ${teamId}`);
     next();
   } catch (err) {
     next(err);
@@ -89,7 +89,7 @@ const checkTeamAdmin = async (req, res, next) => {
  */
 const checkBugTeamMatch = (bugIdSource = 'params') => {
   return async (req, res, next) => {
-    console.log("In checkBugTeamMatch middleware");
+    // console.log("In checkBugTeamMatch middleware");
     try {
       const bugId =
         bugIdSource === 'body'

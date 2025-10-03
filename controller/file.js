@@ -26,7 +26,7 @@ const uploadBugAttachment = async (req, res, next) => {
     // Upload file to Cloudinary with retry logic
     const result = await uploadWithRetry(localFilePath);
 
-    console.log("Bug attachment uploaded:", result);
+    // console.log("Bug attachment uploaded:", result);
 
     // Store metadata in the database
     const fileRecord = await File.create({
@@ -51,7 +51,7 @@ const uploadBugAttachment = async (req, res, next) => {
       },
     });
   } catch (err) {
-    console.error("Error uploading bug attachment:", err);
+    // console.error("Error uploading bug attachment:", err);
     next(err);
   }
 };
@@ -105,7 +105,7 @@ const getBugAttachments = async (req, res, next) => {
             cloudinaryUrl: file.cloudinaryUrl, // Original cloudinary URL
           };
         } catch (error) {
-          console.error(`Error generating URL for file ${file.fileId}:`, error);
+    // console.error(`Error generating URL for file ${file.fileId}:`, error);
           return {
             id: file._id,
             fileId: file.fileId,
@@ -126,7 +126,7 @@ const getBugAttachments = async (req, res, next) => {
       attachments: attachmentsWithUrls,
     });
   } catch (err) {
-    console.error("Error retrieving bug attachments:", err);
+    // console.error("Error retrieving bug attachments:", err);
     next(err);
   }
 };
@@ -146,7 +146,7 @@ const handelUploadToCloud = async (req, res, next) => {
     // Upload file to Cloudinary with retry logic
     const result = await uploadWithRetry(localFilePath);
 
-    console.log("File uploaded:", result);
+    // console.log("File uploaded:", result);
 
     // Store metadata in the database
     await File.create({
@@ -184,8 +184,8 @@ const handelViewFromCloud = async (req, res, next) => {
     const response = await axios.get(signedUrl, { responseType: "stream" });
 
     if (response.status !== 200) {
-      console.log("Cloudinary response status:", response.status);
-      console.log("Cloudinary response headers:", response.headers);
+    // console.log("Cloudinary response status:", response.status);
+    // console.log("Cloudinary response headers:", response.headers);
       return res.status(500).json({ message: "Failed to fetch file from Cloudinary" });
     }
 
@@ -222,8 +222,8 @@ const handelDownloadFromCloud = async (req, res, next) => {
     const response = await axios.get(signedUrl, { responseType: "stream" });
 
     if (response.status !== 200) {
-      console.log("Cloudinary response status:", response.status);
-      console.log("Cloudinary response headers:", response.headers);
+    // console.log("Cloudinary response status:", response.status);
+    // console.log("Cloudinary response headers:", response.headers);
       return res.status(500).json({ message: "Failed to fetch file from Cloudinary" });
     }
 
@@ -244,20 +244,20 @@ const deleteAttachment = async (req, res, next) => {
     const { fileId } = req.params;
     const userId = req.user.id;
 
-    console.log(`Delete request for file ${fileId} by user ${userId}`);
+    // console.log(`Delete request for file ${fileId} by user ${userId}`);
 
     // Find the file record
     const file = await File.findById(fileId);
     if (!file) {
-      console.log(`File not found: ${fileId}`);
+    // console.log(`File not found: ${fileId}`);
       return res.status(404).json({ message: "File not found" });
     }
 
-    console.log(`Found file: ${file.originalName}, owner: ${file.ownerId}, cloudinary ID: ${file.fileId}`);
+    // console.log(`Found file: ${file.originalName}, owner: ${file.ownerId}, cloudinary ID: ${file.fileId}`);
 
     // Check if user owns the file or has permission (you can add more permission checks here)
     if (file.ownerId.toString() !== userId) {
-      console.log(`Unauthorized delete attempt: user ${userId} tried to delete file owned by ${file.ownerId}`);
+    // console.log(`Unauthorized delete attempt: user ${userId} tried to delete file owned by ${file.ownerId}`);
       return res.status(403).json({ message: "Not authorized to delete this file" });
     }
 
@@ -274,24 +274,24 @@ const deleteAttachment = async (req, res, next) => {
         resourceType = "video";
       }
       
-      console.log(`Attempting to delete from Cloudinary: ${file.fileId} as ${resourceType}`);
+    // console.log(`Attempting to delete from Cloudinary: ${file.fileId} as ${resourceType}`);
       const result = await cloudinary.uploader.destroy(file.fileId, { resource_type: resourceType });
-      console.log(`Cloudinary deletion result:`, result);
+    // console.log(`Cloudinary deletion result:`, result);
       
       if (result.result === 'ok' || result.result === 'not found') {
         cloudinaryDeleted = true;
-        console.log(`Successfully deleted file from Cloudinary: ${file.fileId}`);
+    // console.log(`Successfully deleted file from Cloudinary: ${file.fileId}`);
       } else {
-        console.warn(`Cloudinary deletion returned unexpected result: ${result.result}`);
+    // console.warn(`Cloudinary deletion returned unexpected result: ${result.result}`);
       }
     } catch (cloudinaryError) {
-      console.error("Error deleting from Cloudinary:", cloudinaryError);
+    // console.error("Error deleting from Cloudinary:", cloudinaryError);
       // Continue with database deletion even if Cloudinary deletion fails
     }
 
     // Delete file record from database
     await File.findByIdAndDelete(fileId);
-    console.log(`Successfully deleted file record from database: ${fileId}`);
+    // console.log(`Successfully deleted file record from database: ${fileId}`);
 
     return res.status(200).json({ 
       message: "File deleted successfully",
@@ -300,7 +300,7 @@ const deleteAttachment = async (req, res, next) => {
       fileName: file.originalName
     });
   } catch (err) {
-    console.error("Error deleting file:", err);
+    // console.error("Error deleting file:", err);
     next(err);
   }
 };

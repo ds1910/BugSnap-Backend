@@ -139,9 +139,9 @@ const sendmailForSignup = async ({ to, name, loginURL }) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Email sent:", info.messageId);
+    // console.log("✅ Email sent:", info.messageId);
   } catch (error) {
-    console.error("❌ Error sending email:", error);
+    // console.error("❌ Error sending email:", error);
     throw new Error("Email failed to send");
   }
 };
@@ -171,14 +171,14 @@ const handleUserSignup = async (req, res) => {
 
   const userData = JSON.stringify({ name: name, email: email }); 
  // const encrypted = encrypt(userData);
-  console.log("User data to encrypt:", userData);
+  // console.log("User data to encrypt:", userData);
    // Instead of res.redirect
   return res.status(200).json({
     message: "SignUp successful",
     userData
   });
   } catch (error) {
-    console.error("Signup error:", error);
+    // console.error("Signup error:", error);
     return res
       .status(500)
       .json({ error: "Something went wrong during signup" });
@@ -232,7 +232,7 @@ const handleUserLogin = async (req, res) => {
       encrypted
     });
   } catch (err) {
-    console.error("Login error:", err);
+    // console.error("Login error:", err);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -275,9 +275,9 @@ const sendEmail = async ({ to, resetLink }) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent:", info.messageId);
+    // console.log("Email sent:", info.messageId);
   } catch (error) {
-    console.error("Error sending email:", error);
+    // console.error("Error sending email:", error);
     throw new Error("Email failed to send");
   }
 };
@@ -292,7 +292,7 @@ const handelForgotPassword = async (req, res) => {
   // Check if email exists in DB
   const user = await USER.findOne({ email });
 
-  console.log("User found for password reset:", user);
+  // console.log("User found for password reset:", user);
   if (!user) {
     if (req.is("application/json")) {
       return res.status(401).json({ error: "Invalid email" });
@@ -367,7 +367,7 @@ const handleResetPassword = async (req, res) => {
     // Return JSON success response (no redirects)
     return res.status(200).json({ message: "Password reset successful" });
   } catch (err) {
-    console.error("handleResetPassword error:", err);
+    // console.error("handleResetPassword error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -417,7 +417,7 @@ const getCurrentUser = async (req, res) => {
       }
     });
   } catch (err) {
-    console.error("Get current user error:", err);
+    // console.error("Get current user error:", err);
     return res.status(500).json({ error: "Internal server error" });
   }
 };

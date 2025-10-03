@@ -74,7 +74,7 @@ const createComment = async (req, res) => {
       comment: commentWithAuthor,
     });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({
       success: false,
       error: "Failed to create comment",
@@ -139,7 +139,7 @@ const getCommentsForBug = async (req, res) => {
       comments: normalized,
     });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return res.status(500).json({
       success: false,
       error: "Failed to fetch comments",
@@ -272,7 +272,7 @@ const updateCommentById = async (req, res) => {
       data: updatedComment,
     });
   } catch (error) {
-    console.error("Error updating comment:", error);
+    // console.error("Error updating comment:", error);
     return res.status(500).json({
       success: false,
       error: "Server error",
@@ -283,7 +283,7 @@ const updateCommentById = async (req, res) => {
 
 // DELETE /comment/:commentId
 const deleteCommentById = async (req, res) => {
-  console.log("in deleteCommentById");
+    // console.log("in deleteCommentById");
   const { commentId } = req.params;
   const user = req.user;
   const userId = user && (user.id || user._id);
@@ -373,7 +373,7 @@ const deleteCommentById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error deleting comment:", error);
+    // console.error("Error deleting comment:", error);
     return res.status(500).json({
       success: false,
       error: "Server error",
@@ -447,7 +447,7 @@ const createReplyToComment = async (req, res) => {
       reply: replyWithAuthor,
     });
   } catch (error) {
-    console.error("Error creating reply:", error);
+    // console.error("Error creating reply:", error);
     return res.status(500).json({
       error: "Failed to add reply",
       details: error.message,
@@ -536,7 +536,7 @@ const getRepliesForComment = async (req, res) => {
       replies: normalized,
     });
   } catch (error) {
-    console.error("Failed to fetch replies:", error);
+    // console.error("Failed to fetch replies:", error);
     return res.status(500).json({
       success: false,
       error: "Failed to fetch replies",
@@ -627,7 +627,7 @@ const updateReply = async (req, res) => {
         data: updatedReply,
       });
     } catch (err) {
-      console.error("Error updating reply:", err);
+    // console.error("Error updating reply:", err);
       return res.status(500).json({
         success: false,
         error: "Server error",
@@ -644,7 +644,7 @@ const updateReply = async (req, res) => {
 };
 
 const deleteReply = async (req, res) => {
-  console.log(req.body);
+    // console.log(req.body);
   try {
     // Auth
     const user = req.user;
@@ -663,10 +663,10 @@ const deleteReply = async (req, res) => {
       return res.status(400).json({ error: "Invalid replyId" });
     }
 
-    console.log("replystr: " + replyIdStr);
+    // console.log("replystr: " + replyIdStr);
     const replyDoc = await Comment.findById(replyIdStr).lean();
 
-    console.log(replyDoc);
+    // console.log(replyDoc);
     if (!replyDoc) {
       return res.status(404).json({ error: "Reply not found" });
     }

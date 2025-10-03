@@ -149,7 +149,7 @@ const handleCreateBug = async (req, res) => {
 
     return res.status(201).json({ message: "Bug created", bug: bugWithAssignee });
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     return res.status(400).json({ error: err.message });
   }
 };
@@ -295,11 +295,11 @@ const handleUpdateBugById = async (req, res) => {
 
     // 3. Handle assignedName conversion to assignedTo ObjectIds
     if (updates.assignedName && Array.isArray(updates.assignedName)) {
-      console.log("🔍 Processing assignedName:", JSON.stringify(updates.assignedName, null, 2));
+    // console.log("🔍 Processing assignedName:", JSON.stringify(updates.assignedName, null, 2));
       const assignedUsers = [];
       
       for (const assignee of updates.assignedName) {
-        console.log("🔍 Processing assignee:", JSON.stringify(assignee, null, 2));
+    // console.log("🔍 Processing assignee:", JSON.stringify(assignee, null, 2));
         
         // Handle different formats: string, object with name, object with email
         let searchName = null;
@@ -314,7 +314,7 @@ const handleUpdateBugById = async (req, res) => {
           searchEmail = assignee.email;
         }
         
-        console.log(`🔍 Search criteria - Name: "${searchName}", Email: "${searchEmail}"`);
+    // console.log(`🔍 Search criteria - Name: "${searchName}", Email: "${searchEmail}"`);
         
         if (searchName || searchEmail) {
           // Build query conditions dynamically
@@ -329,37 +329,37 @@ const handleUpdateBugById = async (req, res) => {
             queryConditions.push({ email: searchEmail });
           }
           
-          console.log("🔍 Query conditions:", JSON.stringify(queryConditions, null, 2));
+    // console.log("🔍 Query conditions:", JSON.stringify(queryConditions, null, 2));
           
           if (queryConditions.length > 0) {
             const userDoc = await User.findOne({
               $or: queryConditions
             }).lean();
             
-            console.log(`🔍 Query result for ${searchName || searchEmail}:`, userDoc ? {
-              id: userDoc._id,
-              name: userDoc.name,
-              email: userDoc.email
-            } : "NOT FOUND");
+            // console.log(`🔍 Query result for ${searchName || searchEmail}:`, userDoc ? {
+            //   id: userDoc._id,
+            //   name: userDoc.name,
+            //   email: userDoc.email
+            // } : "NOT FOUND");
             
             if (userDoc) {
               assignedUsers.push(userDoc._id);
-              console.log(`✅ Added user ${userDoc._id} to assignment list`);
+    // console.log(`✅ Added user ${userDoc._id} to assignment list`);
             } else {
-              console.log(`❌ No user found for: ${searchName || searchEmail}`);
+    // console.log(`❌ No user found for: ${searchName || searchEmail}`);
             }
           }
         }
       }
       
-      console.log("🔍 Final assignedUsers array (ObjectIds):", assignedUsers);
+    // console.log("🔍 Final assignedUsers array (ObjectIds):", assignedUsers);
       
       // 🔧 DEDUPLICATION: Remove duplicate ObjectIds to prevent duplicate assignments
       const uniqueAssignedUsers = [...new Set(assignedUsers.map(id => id.toString()))].map(id => new mongoose.Types.ObjectId(id));
-      console.log("🔍 After deduplication - Unique assignedUsers:", uniqueAssignedUsers);
-      console.log("🔍 Removed duplicates count:", assignedUsers.length - uniqueAssignedUsers.length);
+    // console.log("🔍 After deduplication - Unique assignedUsers:", uniqueAssignedUsers);
+    // console.log("🔍 Removed duplicates count:", assignedUsers.length - uniqueAssignedUsers.length);
       
-      console.log("🔍 Setting updates.assignedTo to:", uniqueAssignedUsers);
+    // console.log("🔍 Setting updates.assignedTo to:", uniqueAssignedUsers);
       updates.assignedTo = uniqueAssignedUsers;
       delete updates.assignedName; // Remove this from updates as it's not a database field
     }
@@ -397,32 +397,32 @@ const handleUpdateBugById = async (req, res) => {
       }
     }
     
-    console.log("🔍 Final updates object before apply:", JSON.stringify(updates, null, 2));
+    // console.log("🔍 Final updates object before apply:", JSON.stringify(updates, null, 2));
 
     // 4. Apply updates
-    console.log("🔍 Before Object.assign - Bug assignedTo:", bug.assignedTo);
+    // console.log("🔍 Before Object.assign - Bug assignedTo:", bug.assignedTo);
     Object.assign(bug, updates);
-    console.log("🔍 After Object.assign - Bug assignedTo:", bug.assignedTo);
-    console.log("After Object.assign - Bug:", {
-      id: bug._id,
-      title: bug.title,
-      description: bug.description,
-      status: bug.status,
-      priority: bug.priority,
-      assignedTo: bug.assignedTo
-    });
+    // console.log("🔍 After Object.assign - Bug assignedTo:", bug.assignedTo);
+    // console.log("After Object.assign - Bug:", {
+    //   id: bug._id,
+    //   title: bug.title,
+    //   description: bug.description,
+    //   status: bug.status,
+    //   priority: bug.priority,
+    //   assignedTo: bug.assignedTo
+    // });
     
-    console.log("🔍 About to save bug with assignedTo:", bug.assignedTo);
+    // console.log("🔍 About to save bug with assignedTo:", bug.assignedTo);
     const savedBug = await bug.save();
-    console.log("🔍 After save - DB assignedTo:", savedBug.assignedTo);
-    console.log("After save - Saved Bug:", {
-      id: savedBug._id,
-      title: savedBug.title,
-      description: savedBug.description,
-      status: savedBug.status,
-      priority: savedBug.priority,
-      assignedTo: savedBug.assignedTo
-    });
+    // console.log("🔍 After save - DB assignedTo:", savedBug.assignedTo);
+    // console.log("After save - Saved Bug:", {
+    //   id: savedBug._id,
+    //   title: savedBug.title,
+    //   description: savedBug.description,
+    //   status: savedBug.status,
+    //   priority: savedBug.priority,
+    //   assignedTo: savedBug.assignedTo
+    // });
 
     // 5. Populate assigned users (optional enrichment)
     const assignedIds = Array.isArray(savedBug.assignedTo)
@@ -468,7 +468,7 @@ const handleUpdateBugById = async (req, res) => {
       bug: bugWithAssignee 
     });
   } catch (err) {
-    console.error("Error in updateBugById:", err);
+    // console.error("Error in updateBugById:", err);
     return res.status(400).json({ 
       success: false,
       error: err.message || "Failed to update bug" 
@@ -660,7 +660,7 @@ const handleBugFileUpload = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("Error in handleBugFileUpload:", err);
+    // console.error("Error in handleBugFileUpload:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };

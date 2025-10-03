@@ -1,0 +1,662 @@
+const aiAgent = require('../services/aiAgent');
+const botIntegration = require('../services/botIntegration');
+const BugIntents = require('../intents/bugIntents');
+const UserIntents = require('../intents/userIntents');
+const TeamIntents = require('../intents/teamIntents');
+const CommentIntents = require('../intents/commentIntents');
+const FileIntents = require('../intents/fileIntents');
+const axios = require('axios');
+
+// Bot controller for handling AI agent interactions
+class BotController {
+  
+  // Main chat endpoint
+  static async chat(req, res) {
+    try {
+      const { message, context } = req.body;
+      const userId = req.user?.id;
+      
+      // Generate initial suggestions based on user's context
+      const suggestions = BotController.generateQuerySuggestions('general', 'all');
+      
+      return res.json({
+        success: true,
+        data: {
+          context: userContext,
+          suggestions: suggestions.slice(0, 5), // Return top 5 suggestions
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error('Get user context error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to get user context'
+      });
+    }
+  }
+
+  // Health check endpoint for bot service
+  static async healthCheck(req, res) {
+    try {
+      return res.json({
+        success: true,
+        message: 'Bot service is running',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0'
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        error: 'Bot service health check failed'
+      });
+    }
+  }.body;
+      const userId = req.user?.id;
+      
+      // Validate message input
+      if (!message) {
+        return res.status(400).json({
+          success: false,
+          error: 'Message is required'
+        });
+      }
+      
+      if (typeof message !== 'string') {
+        return res.status(400).json({
+          success: false,
+          error: 'Message must be a string'
+        });
+      }
+      
+      if (message.trim() === '') {
+        return res.status(400).json({
+          success: false,
+          error: 'Message cannot be empty'
+        });
+      }
+
+      // Process the message through AI agent
+      const response = await aiAgent.processMessage(userId, message, req.user);
+      
+      // Get contextual suggestions from the response
+      const suggestions = response.suggestions || aiAgent.generateSuggestions(response.intent, response.entities);
+      
+      return res.json({
+        success: true,
+        data: {
+          ...response,
+          suggestions: suggestions.slice(0, 3), // Limit to 3 suggestions
+          user: {
+            id: userId,
+            name: req.user?.name || 'User'
+          }
+        }
+      });
+      
+    } catch (error) {
+      console.error('Bot chat error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+        message: 'Sorry, I encountered an error. Please try again.'
+      });
+    }
+  }
+
+  // Dynamic natural language query processing endpoint
+  static async processNaturalQuery(req, res) {
+    try {
+      const { query, queryType = 'general' } = req.body;
+      const userId = req.user?.id;
+      
+      // Validate query input
+      if (!query) {
+        return res.status(400).json({
+          success: false,
+          error: 'Query is required'
+        });
+      }
+      
+      if (typeof query !== 'string') {
+        return res.status(400).json({
+          success: false,
+          error: 'Query must be a string'
+        });
+      }
+      
+      if (query.trim() === '') {
+        return res.status(400).json({
+          success: false,
+          error: 'Query cannot be empty'
+        });
+      }
+
+      // Parse the natural language query
+      const parsedQuery = aiAgent.parseNaturalQuery(query);
+      const entities = aiAgent.extractEntities(query, parsedQuery.entityType);
+      
+      let result;
+      
+      // Route query to appropriate intent handler based on entity type
+      switch (parsedQuery.entityType) {
+        case 'bug':
+          result = await BugIntents.processDynamicQuery(query, entities, userId, req.user?.teams);
+          break;
+        case 'user':
+          result = await UserIntents.processDynamicQuery(query, entities, userId, req.user?.teams);
+          break;
+        case 'team':
+          result = await TeamIntents.processDynamicQuery(query, entities, userId, req.user?.teams);
+          break;
+        case 'comment':
+          result = await CommentIntents.processDynamicQuery(query, entities, userId, req.user?.teams);
+          break;
+        case 'file':
+          result = await FileIntents.processDynamicQuery(query, entities, userId, req.user?.teams);
+          break;
+        default:
+          // If no specific entity type detected, try a general search across all entities
+          result = await BotController.performGeneralSearch(query, entities, userId, req.user);
+          break;
+      }
+
+      return res.json({
+        success: true,
+        data: {
+          query: query,
+          parsedQuery: parsedQuery,
+          entities: entities,
+          result: result,
+          queryType: parsedQuery.queryType,
+          executionTime: Date.now()
+        }
+      });
+      
+    } catch (error) {
+      console.error('Natural query processing error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Error processing natural language query',
+        message: 'Sorry, I couldn\'t understand or process your query. Please try rephrasing it.'
+      });
+    }
+  }
+
+  // Get query suggestions based on current context
+  static async getQuerySuggestions(req, res) {
+    try {
+      const { context = 'general', entityType = 'all' } = req.query;
+      
+      const suggestions = BotController.generateQuerySuggestions(context, entityType);
+      
+      return res.json({
+        success: true,
+        data: {
+          suggestions,
+          context,
+          entityType
+        }
+      });
+      
+    } catch (error) {
+      console.error('Query suggestions error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Error generating query suggestions'
+      });
+    }
+  }
+
+  // Generate contextual query suggestions
+  static generateQuerySuggestions(context, entityType) {
+    const suggestions = {
+      bugs: [
+        "Show me all open bugs",
+        "Find high priority bugs assigned to me",
+        "What bugs were created this week?",
+        "Show closed bugs from last month",
+        "Find bugs with 'login' in the title",
+        "How many bugs are in progress?",
+        "Show recent frontend bugs",
+        "Find unassigned critical bugs"
+      ],
+      users: [
+        "Show all team members",
+        "Who are the active developers?",
+        "Find users in the frontend team",
+        "Show users who joined this month",
+        "What's the team member count?",
+        "Find users with admin role"
+      ],
+      teams: [
+        "Show all teams",
+        "What teams am I part of?",
+        "Find the largest team",
+        "Show team statistics",
+        "How many teams are active?",
+        "Find teams with most bugs"
+      ],
+      analytics: [
+        "Show bug analytics dashboard",
+        "What's the bug resolution trend?",
+        "Compare open vs closed bugs",
+        "Show team performance metrics",
+        "What's the average bug resolution time?",
+        "Show priority distribution of bugs"
+      ],
+      general: [
+        "What's happening in my project?",
+        "Show me project overview",
+        "Find anything related to 'authentication'",
+        "What needs my attention?",
+        "Show recent activity",
+        "Give me a status update"
+      ]
+    };
+
+    if (entityType === 'all') {
+      return Object.values(suggestions).flat().slice(0, 12);
+    }
+    
+    return suggestions[entityType] || suggestions.general;
+  }
+
+  // Perform general search across all entity types
+  static async performGeneralSearch(query, entities, userId, user) {
+    try {
+      const results = {
+        bugs: [],
+        users: [],
+        teams: [],
+        comments: [],
+        files: []
+      };
+
+      // Search across all entity types
+      const searchPromises = [
+        BugIntents.getBugsByCriteria(userId, query).catch(() => ({ bugs: [] })),
+        UserIntents.searchUsers(query, userId, user?.teams).catch(() => ({ users: [] })),
+        TeamIntents.searchTeams(query, userId).catch(() => ({ teams: [] })),
+        CommentIntents.searchComments(query, userId, user?.teams).catch(() => ({ comments: [] })),
+        FileIntents.searchFiles(query, userId, user?.teams).catch(() => ({ files: [] }))
+      ];
+
+      const searchResults = await Promise.all(searchPromises);
+      
+      // Combine results
+      if (searchResults[0]?.bugs) results.bugs = searchResults[0].bugs.slice(0, 5);
+      if (searchResults[1]?.users) results.users = searchResults[1].users.slice(0, 5);
+      if (searchResults[2]?.teams) results.teams = searchResults[2].teams.slice(0, 5);
+      if (searchResults[3]?.comments) results.comments = searchResults[3].comments.slice(0, 5);
+      if (searchResults[4]?.files) results.files = searchResults[4].files.slice(0, 5);
+
+      return {
+        success: true,
+        results,
+        totalResults: Object.values(results).flat().length,
+        message: `Found results across multiple categories for "${query}"`
+      };
+      
+    } catch (error) {
+      console.error('General search error:', error);
+      return {
+        success: false,
+        message: 'Error performing general search',
+        error: error.message
+      };
+    }
+  }
+
+  // Execute actions based on AI agent response
+  static async executeAction(req, action) {
+    const userId = req.user?.id;
+    const baseURL = process.env.BACKEND_URL_MAIN || 'http://localhost:8019';
+    
+    try {
+      switch (action.type) {
+        case 'api_call':
+          return await BotController.makeAPICall(req, action);
+          
+        case 'form':
+          return await BotController.handleFormAction(req, action);
+          
+        case 'dashboard':
+          return await BotController.getDashboardData(req, action);
+          
+        case 'display':
+          return BotController.getDisplayContent(action);
+          
+        default:
+          return { type: 'message', content: 'I\'m not sure how to help with that.' };
+      }
+    } catch (error) {
+      console.error('Action execution error:', error);
+      return { 
+        type: 'error', 
+        content: 'Sorry, I couldn\'t complete that action right now.' 
+      };
+    }
+  }
+
+  // Make API calls to existing endpoints
+  static async makeAPICall(req, action) {
+    const { endpoint, params = {} } = action;
+    const baseURL = 'http://localhost:8019'; // Internal API call
+    
+    try {
+      const config = {
+        headers: {
+          'Cookie': req.headers.cookie || '', // Forward cookies for authentication
+          'Content-Type': 'application/json'
+        }
+      };
+
+      let response;
+      
+      switch (endpoint) {
+        case '/bug/all':
+          // Get active team from user's context or localStorage equivalent
+          const teamId = await BotController.getActiveTeamId(req);
+          if (!teamId) {
+            return {
+              type: 'message',
+              content: 'You need to be part of a team to view bugs. Would you like me to help you create a team?'
+            };
+          }
+          
+          response = await axios.get(`${baseURL}/bug/all`, {
+            ...config,
+            params: { teamId, ...params }
+          });
+          
+          return {
+            type: 'bug_list',
+            content: response.data,
+            summary: `Found ${response.data.length || 0} bugs`
+          };
+          
+        case '/team/allTeam':
+          response = await axios.get(`${baseURL}/team/allTeam`, config);
+          return {
+            type: 'team_list',
+            content: response.data,
+            summary: `You have ${response.data.teams?.length || 0} teams`
+          };
+          
+        case '/people/getAllPeople':
+          response = await axios.get(`${baseURL}/people/getAllPeople`, config);
+          return {
+            type: 'people_list',
+            content: response.data,
+            summary: `Found ${response.data.people?.length || 0} team members`
+          };
+          
+        default:
+          return {
+            type: 'message',
+            content: 'I\'m not sure how to fetch that information right now.'
+          };
+      }
+      
+    } catch (error) {
+      console.error('API call error:', error);
+      
+      if (error.response?.status === 401) {
+        return {
+          type: 'message',
+          content: 'You need to be logged in to access this information.'
+        };
+      }
+      
+      return {
+        type: 'message',
+        content: 'Sorry, I couldn\'t fetch that information right now. Please try again later.'
+      };
+    }
+  }
+
+  // Handle form-related actions
+  static async handleFormAction(req, action) {
+    const { form, prefill = {} } = action;
+    
+    const forms = {
+      bug_create: {
+        type: 'form',
+        formType: 'bug_create',
+        title: 'Create New Bug',
+        fields: [
+          {
+            name: 'title',
+            type: 'text',
+            label: 'Bug Title',
+            required: true,
+            value: prefill.title || ''
+          },
+          {
+            name: 'description',
+            type: 'textarea',
+            label: 'Description',
+            required: true,
+            value: ''
+          },
+          {
+            name: 'priority',
+            type: 'select',
+            label: 'Priority',
+            options: ['Low', 'Medium', 'High', 'Critical'],
+            value: prefill.priority || 'Medium'
+          },
+          {
+            name: 'assignee',
+            type: 'select',
+            label: 'Assign To',
+            options: [], // Will be populated by frontend
+            value: ''
+          }
+        ]
+      },
+      team_create: {
+        type: 'form',
+        formType: 'team_create',
+        title: 'Create New Team',
+        fields: [
+          {
+            name: 'name',
+            type: 'text',
+            label: 'Team Name',
+            required: true,
+            value: prefill.teamName || ''
+          },
+          {
+            name: 'description',
+            type: 'textarea',
+            label: 'Description',
+            required: false,
+            value: ''
+          }
+        ]
+      }
+    };
+    
+    return forms[form] || {
+      type: 'message',
+      content: 'I\'m not sure what form you need. Please be more specific.'
+    };
+  }
+
+  // Get dashboard data with enhanced statistics
+  static async getDashboardData(req, action) {
+    try {
+      const stats = await botIntegration.getProjectStats(req);
+      
+      let summary = `📊 **Project Overview:**\n`;
+      summary += `• **Teams:** ${stats.teams?.total || 0} (${stats.teams?.active || 0} active)\n`;
+      summary += `• **People:** ${stats.people?.total || 0} team members\n`;
+      summary += `• **Bugs:** ${stats.bugs?.total || 0} total\n`;
+
+      if (stats.bugs.total > 0) {
+        summary += `\n🐛 **Bug Breakdown:**\n`;
+        if (stats.bugs.byPriority.High || stats.bugs.byPriority.Critical) {
+          summary += `• High/Critical: ${(stats.bugs.byPriority.High || 0) + (stats.bugs.byPriority.Critical || 0)}\n`;
+        }
+        if (stats.bugs.byStatus.Open) {
+          summary += `• Open: ${stats.bugs.byStatus.Open}\n`;
+        }
+        if (stats.bugs.byStatus['In Progress']) {
+          summary += `• In Progress: ${stats.bugs.byStatus['In Progress']}\n`;
+        }
+      }
+      
+      return {
+        type: 'dashboard',
+        content: stats,
+        summary: summary
+      };
+      
+    } catch (error) {
+      console.error('Dashboard data error:', error);
+      return {
+        type: 'message',
+        content: 'Sorry, I couldn\'t get your dashboard data right now.'
+      };
+    }
+  }
+
+  // Get display content
+  static getDisplayContent(action) {
+    const content = {
+      help_menu: {
+        type: 'help',
+        content: `
+**What I can help you with:**
+
+🐛 **Bug Management**
+- "Create a new bug" - Create bug reports
+- "Show all bugs" - List your bugs
+- "Show high priority bugs" - Filter by priority
+
+👥 **Team Management**  
+- "Create a team" - Start a new team
+- "List my teams" - See all your teams
+- "Add members to team" - Invite people
+
+👤 **People & Collaboration**
+- "Show team members" - View your colleagues
+- "Who's in my team?" - List team members
+
+📊 **Project Overview**
+- "Project status" - Get dashboard view
+- "What's happening?" - Overview of activity
+
+Just ask me naturally! I understand conversational language.
+        `
+      },
+      welcome: {
+        type: 'message',
+        content: 'Welcome to BugSnap! I\'m your AI assistant ready to help you manage your projects more efficiently.'
+      },
+      farewell: {
+        type: 'message',
+        content: 'Thanks for using BugSnap! I\'m always here when you need help.'
+      },
+      default: {
+        type: 'message',
+        content: 'I\'m here to help! Ask me about bugs, teams, or project management.'
+      }
+    };
+    
+    return content[action.content] || content.default;
+  }
+
+  // Helper method to get active team ID
+  static async getActiveTeamId(req) {
+    try {
+      // First try to get from user's teams
+      const teamsResponse = await axios.get('http://localhost:8019/team/allTeam', {
+        headers: {
+          'Cookie': req.headers.cookie || '',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const teams = teamsResponse.data.teams || [];
+      if (teams.length > 0) {
+        return teams[0]._id; // Return first team ID
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error getting active team:', error);
+      return null;
+    }
+  }
+
+  // Clear conversation context
+  static async clearContext(req, res) {
+    try {
+      const userId = req.user?.id;
+      
+      if (userId) {
+        aiAgent.clearContext(userId);
+      }
+      
+      return res.json({
+        success: true,
+        message: 'Conversation context cleared'
+      });
+      
+    } catch (error) {
+      console.error('Clear context error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to clear context'
+      });
+    }
+  }
+
+  // Get conversation history/context
+  static async getContext(req, res) {
+    try {
+      const userId = req.user?.id;
+      const context = aiAgent.getContext(userId);
+      const suggestions = aiAgent.getSuggestions(userId, req.user);
+      
+      return res.json({
+        success: true,
+        data: {
+          context,
+          suggestions
+        }
+      });
+      
+    } catch (error) {
+      console.error('Get context error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to get context'
+      });
+    }
+  }
+
+  // Health check for bot service
+  static async healthCheck(req, res) {
+    try {
+      return res.json({
+        success: true,
+        message: 'Bot service is running',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0'
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        error: 'Bot service health check failed'
+      });
+    }
+  }
+
+
+}
+
+module.exports = BotController;

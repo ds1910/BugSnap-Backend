@@ -3,13 +3,13 @@ const USER = require("../model/user"); // Optional if not used here
 const multer = require("../middleware/multer")
 
 const { handleAddPeople,handleInvitePeople ,handelGetAllPeople,handelDeletePerson,handelSendMessage,testFriendships } = require("../controller/people");
-
+const cache = require("../middleware/redis");
 const router = express.Router();
 
 //router.route("/add",handelAddPeople);
 router.route("/invite").post(handleInvitePeople);
 router.route("/add").post(handleAddPeople);
-router.route("/getAllPeople").get(handelGetAllPeople);
+router.route("/getAllPeople").get(cache(600),handelGetAllPeople);
 router.route("/delete").delete(handelDeletePerson);
 router.route("/sendmessage").post( multer.array("attachments"),handelSendMessage);
 router.route("/test-friendships").get(testFriendships);

@@ -9,6 +9,7 @@ const {
   getAllAssignedBugs,
   handleBugFileUpload,
 } = require("../controller/bug");
+const cache = require("../middleware/redis");
 
 const {checkTeamMembership, checkTeamAdmin, checkBugTeamMatch } = require("../middleware/teamMiddleware");
 const upload = require("../middleware/multer");
@@ -19,12 +20,12 @@ router.route("/create").post(checkTeamMembership('body'), handleCreateBug);
 router.route("/").post(checkTeamMembership('query'), handleCreateBug);
 
 // Get all bugs for team - requires team membership
-router.route("/all").get(checkTeamMembership('query'), handleGetAllBugsForTeam);
+router.route("/all").get(checkTeamMembership('query'),cache(600), handleGetAllBugsForTeam);
 
 // Bug management operations - requires team membership
 router
   .route("/manage/:id")
-  .get(checkTeamMembership('query'), handleGetBugById)
+  .get(checkTeamMembership('query'),cache(600), handleGetBugById)
   .patch(checkTeamMembership('query'), handleUpdateBugById)
   .delete(checkTeamMembership('query'), handleDeleteBugById);
 

@@ -40,6 +40,7 @@ const bugRouter = require("./routes/bug");          // Bug tracking routes (prot
 const mediaRouter = require("./routes/media");
 const commentRouter = require("./routes/comment");
 const peopleRouter = require("./routes/people");
+const botRouter = require("./routes/bot");          // AI Bot routes (protected)
 const { title } = require("process");
 const { Socket } = require("dgram");
 
@@ -112,8 +113,8 @@ app.use(cors({
 // MongoDB Connection
 // ==============================
 connectMongoDb("mongodb://127.0.0.1:27017/BugSnap")
-  .then(() => console.log("✅ MongoDB connected successfully"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+   .then(() => console.log("✅ MongoDB connected successfully"))
+   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 
 
@@ -129,11 +130,23 @@ connectMongoDb("mongodb://127.0.0.1:27017/BugSnap")
 
 app.use("/user", userRouter);               // Public: Signup, Login, Logout, Password Reset
 app.use("/auth", authRouter);               // Public: Google/GitHub OAuth
+
+// Public health check endpoint for bot service
+app.get("/bot/health", (req, res) => {
+  return res.json({
+    success: true,
+    message: 'Bot service is running',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
+});
+
 app.use("/team",checkAuthentication,teamRouter); // Protected: Team management routes
 app.use("/bug",checkAuthentication, bugRouter); // Protected: Bug tracking routes 
 app.use("/media", checkAuthentication, mediaRouter);
 app.use("/comment",checkAuthentication,commentRouter);
 app.use("/people",checkAuthentication,peopleRouter);
+app.use("/bot", checkAuthentication, botRouter); // Protected: AI Bot routes
 
 
 
@@ -174,5 +187,5 @@ app.use(isError);
 // Start the Server
 // ==============================
 app.listen(PORT, () => {
-  console.log(`🚀 Server started on http://localhost:${PORT}`);
+   console.log(`🚀 Server started on http://localhost:${PORT}`);
 });

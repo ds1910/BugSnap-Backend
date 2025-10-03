@@ -11,6 +11,7 @@ const {
   deleteTeam,
 } = require("../controller/team");
 
+const cache = require("../middleware/redis");
 const router = express.Router();
 
 /**
@@ -57,7 +58,7 @@ router.post("/create", createTeam);
  *       404:
  *         description: Team not found
  */
-router.get("/allTeam", getAllTeams);
+router.get("/allTeam",cache(600), getAllTeams);
 
 /**
  * @swagger
@@ -123,24 +124,27 @@ router.patch("/remove-member", removeMemberFromTeam);
 
 /**
  * @swagger
- * /team/{teamId}/members:
- *   get:
+ * /team/members:
+ *   post:
  *     summary: Get all members of a team
  *     tags: [Team]
- *     parameters:
- *       - in: path
- *         name: teamId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID of the team
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               teamId:
+ *                 type: string
+ *                 description: ID of the team
  *     responses:
  *       200:
  *         description: List of team members
  *       404:
  *         description: Team not found
  */
-router.get("/members", getTeamMembers);
+router.post("/members",cache(600), getTeamMembers);
 
 /**
  * @swagger

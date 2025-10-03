@@ -23,8 +23,8 @@ const createTeam = async (req, res) => {
     const name = req.body.name;
     const description = req.body.description;
     //    const { name, description = "" } = req.body;
-    console.log("in create team")
-    console.log(req.body);
+    // console.log("in create team")
+    // console.log(req.body);
 
     if (!name) {
       return res.status(400).json({ error: "Team name is required." });
@@ -45,10 +45,10 @@ const createTeam = async (req, res) => {
       members: [{ user: createdBy, role: "admin" }],
     });
 
-    console.log(team);
+    // console.log(team);
     return res.status(201).json({ message: "Team created successfully", team });
   } catch (error) {
-    console.error("Error creating team:", error);
+    // console.error("Error creating team:", error);
     return res.status(500).json({ error: "Failed to create team." });
   }
 };
@@ -98,7 +98,7 @@ const getTeamMembers = async (req, res) => {
 
     return res.status(200).json({ members });
   } catch (error) {
-    console.error("Error getting team members:", error);
+    // console.error("Error getting team members:", error);
     return res.status(500).json({ error: "Failed to get team members." });
   }
 };
@@ -126,7 +126,7 @@ const getAllTeams = async (req, res) => {
       count: teams.length
     });
   } catch (error) {
-    console.error("Error getting all teams:", error);
+    // console.error("Error getting all teams:", error);
     return res.status(500).json({ error: "Failed to get teams." });
   }
 };
@@ -146,7 +146,7 @@ const getTeamById = async (req, res) => {
 
     return res.status(200).json({ teams });
   } catch (error) {
-    console.error("Error getting team details:", error);
+    // console.error("Error getting team details:", error);
     return res.status(500).json({ error: "Failed to get team details." });
   }
 };
@@ -194,13 +194,13 @@ const addMemberToTeam = async (req, res) => {
       return res.status(404).json({ error: "Team not found." });
     }
     
-    console.log(team);
+    // console.log(team);
     // only admin can add members
     if (!isAdmin(team, currentUserId)) {
       return res.status(403).json({ error: "Only admin can add members." });
     }
 
-    console.log(" isAdmin passed");
+    // console.log(" isAdmin passed");
     // check duplicate membership (normalize to string)
     const alreadyMember = team.members.some(
       (member) => member.user.toString() === userId.toString()
@@ -212,7 +212,7 @@ const addMemberToTeam = async (req, res) => {
         .json({ error: "User is already a member of the team." });
     }
      
-     console.log("pushing");
+     // console.log("pushing");
     // push and save
     team.members.push({ user: userId, role });
     await team.save();
@@ -221,11 +221,11 @@ const addMemberToTeam = async (req, res) => {
     // optional: populate members.user for friendly response
     await team.populate({ path: "members.user", select: "name email" });
 
-    console.log("all done");
+    // console.log("all done");
 
     return res.status(200).json({ message: "Member added successfully", team });
   } catch (error) {
-    console.error("Error adding member:", error);
+    // console.error("Error adding member:", error);
     return res.status(500).json({ error: "Failed to add member." });
   }
 };
@@ -278,7 +278,7 @@ const removeMemberFromTeam = async (req, res) => {
 
     return res.status(200).json({ message: "Member removed successfully", team });
   } catch (error) {
-    console.error("Error removing member:", error);
+    // console.error("Error removing member:", error);
     return res.status(500).json({ error: "Failed to remove member." });
   }
 };
@@ -287,7 +287,7 @@ const removeMemberFromTeam = async (req, res) => {
 const updateMemberRole = async (req, res) => {
   try {
     const { teamId, userMail, role } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     if (!teamId || !userMail || !role) {
       return res.status(400).json({ error: "teamId, userMail and role are required." });
     }
@@ -334,7 +334,7 @@ const updateMemberRole = async (req, res) => {
 
     return res.status(200).json({ message: "Member role updated", team });
   } catch (error) {
-    console.error("Error updating member role:", error);
+    // console.error("Error updating member role:", error);
     return res.status(500).json({ error: "Failed to update member role." });
   }
 };
@@ -360,11 +360,11 @@ const updateTeam = async (req, res) => {
     if (description) team.description = description;
 
     await team.save();
-    console.log("Team updated:", team);
+    // console.log("Team updated:", team);
 
     return res.status(200).json({ message: "Team updated successfully", team });
   } catch (error) {
-    console.error("Error updating team:", error);
+    // console.error("Error updating team:", error);
     return res.status(500).json({ error: "Failed to update team." });
   }
 };
@@ -393,11 +393,11 @@ const deleteTeam = async (req, res) => {
     await Team.findByIdAndDelete(teamId);
 
     // ✅ optionally clean references (users, bugs, etc.)
-    console.log("Team deleted:", teamId);
+    // console.log("Team deleted:", teamId);
 
     return res.status(200).json({ message: "Team deleted successfully." });
   } catch (error) {
-    console.error("Error deleting team:", error);
+    // console.error("Error deleting team:", error);
     return res.status(500).json({ error: "Failed to delete team." });
   }
 };

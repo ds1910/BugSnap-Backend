@@ -74,16 +74,16 @@ const handleGoogleLoginCallBack = async (req, res) => {
     if (!user) {
       user = await User.create({ name, email, image: picture });
       isNewUser = true;
-      console.log(`Created new user: ${name} (${email})`);
+      // console.log(`Created new user: ${name} (${email})`);
     }
 
     // Auto-accept any pending invitations for this email
     let acceptedCount = 0;
     if (isNewUser) {
-      console.log(`Checking for pending invitations for new user: ${email}`);
+      // console.log(`Checking for pending invitations for new user: ${email}`);
       acceptedCount = await autoAcceptInvitations(email, user._id);
       if (acceptedCount > 0) {
-        console.log(`Auto-accepted ${acceptedCount} invitations for ${email}`);
+        // console.log(`Auto-accepted ${acceptedCount} invitations for ${email}`);
       }
     }
 
@@ -91,7 +91,7 @@ const handleGoogleLoginCallBack = async (req, res) => {
     const accessToken = generateAccessToken({ id: user._id });
     const refreshToken = generateRefreshToken({ id: user._id });
 
-    console.log("from oauth: accessToken, refreshToken", accessToken, refreshToken);
+    // console.log("from oauth: accessToken, refreshToken", accessToken, refreshToken);
     // Set tokens in cookies
       setTokenCookie(res, { accessToken, refreshToken });
 
@@ -109,21 +109,21 @@ const handleGoogleLoginCallBack = async (req, res) => {
 
     const encrypted = encrypt(userData); 
     // console.log("encrypted data", encrypted);
-    console.log("in google login callback", userData);
+    // console.log("in google login callback", userData);
     // console.log("FRONTEND_URL_MAIN: "+FRONTEND_URL_MAIN);
     
     // Add inviteAccepted parameter if this was a new user with auto-accepted invitations
     let redirectUrl = `${FRONTEND_URL_MAIN}/dashboard/?data=${encodeURIComponent(encrypted)}`;
     if (isNewUser && acceptedCount > 0) {
       redirectUrl += `&inviteAccepted=true`;
-      console.log(`Redirecting with inviteAccepted=true (${acceptedCount} invitations auto-accepted)`);
+      // console.log(`Redirecting with inviteAccepted=true (${acceptedCount} invitations auto-accepted)`);
     }
     
    res.redirect(redirectUrl);
 
    
   } catch (error) {
-    console.error("Google Login Error:", error.message);
+    // console.error("Google Login Error:", error.message);
     return res.status(500).json({ message: "Google login failed" });
   }
 };
@@ -214,7 +214,7 @@ const handleGitHubCallback = async (req, res) => {
 
  
   } catch (error) {
-    console.error("GitHub OAuth error:", error);
+    // console.error("GitHub OAuth error:", error);
     return res.status(500).json({
       message: "Internal Server Error",
     });

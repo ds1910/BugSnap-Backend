@@ -78,8 +78,8 @@ const checkAuthentication = async (req, res, next) => {
         setTokenCookie(res, { accessToken: newAccessToken });
 
         req.user = user;
-        console.log("user:", user);
-        console.log("Access token expired but refreshed");
+        // console.log("user:", user);
+        // console.log("Access token expired but refreshed");
         return next();
       } catch (refreshErr) {
         return res.status(403).json({ message: "Refresh token invalid or expired. Please login again." });

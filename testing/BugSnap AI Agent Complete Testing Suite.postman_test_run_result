@@ -1,0 +1,1892 @@
+{
+	"id": "feecb3ad-31e4-4d4b-9883-de3a6bb5cd0e",
+	"name": "BugSnap AI Agent Complete Testing Suite",
+	"timestamp": "2025-10-02T19:13:16.394Z",
+	"collection_id": "43283326-1fb36c83-93ec-4fb6-80f1-87d9aced7328",
+	"folder_id": 0,
+	"environment_id": "0",
+	"totalPass": 63,
+	"delay": 600,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2025-10-02T19:12:34.766Z",
+	"totalFail": 7,
+	"results": [
+		{
+			"id": "11615e70-4e03-4e3e-b03b-0e43ac5f143a",
+			"name": "Chat - Show All Bugs",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true,
+				"Status code is 200": false,
+				"Response has success field": false,
+				"Response contains bug data": false
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response has success field": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response contains bug data": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true,
+					"Status code is 200": false,
+					"Response has success field": false,
+					"Response contains bug data": false
+				}
+			]
+		},
+		{
+			"id": "bf026599-2e83-47a7-ba22-f9ea3a453cc5",
+			"name": "Natural Query - List All Bugs",
+			"url": "http://localhost:8019/bot/query",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "4d6b7eb0-1163-4969-9463-165957aaa0e1",
+			"name": "Chat - High Priority Bugs",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "5abcb55c-3653-49d0-b912-f4d715fd825d",
+			"name": "Natural Query - Open Bugs",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "54c8a2d4-0f2b-4da6-9337-4d3525dd0178",
+			"name": "Chat - My Assigned Bugs",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "a375fca1-637b-45fe-a6e1-e179c9d16be7",
+			"name": "Natural Query - Critical Bugs",
+			"url": "http://localhost:8019/bot/query",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "5956b782-0873-4a6e-bae1-3fdcfeb1daa5",
+			"name": "Chat - Closed Bugs",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "da7d669d-5cde-401e-bd60-25037ad91ece",
+			"name": "Natural Query - Recent Bugs",
+			"url": "http://localhost:8019/bot/query",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "3115b1ca-dc0b-478f-a855-966de024d1b5",
+			"name": "Chat - Show My Teams",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "c316dae8-cbe2-417f-aaef-67b29d62ef96",
+			"name": "Natural Query - List Team Members",
+			"url": "http://localhost:8019/bot/query",
+			"time": 7,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				7
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "f1b72e31-7144-494f-a796-2a8ee82cbb21",
+			"name": "Chat - Team Statistics",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "c71ef789-e450-470c-8fd3-a7e88412d2cc",
+			"name": "Natural Query - Team Details",
+			"url": "http://localhost:8019/bot/query",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "1ec87fd0-7d43-4076-9e8d-906599523641",
+			"name": "Chat - All Teams",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "9fe9a39e-16ba-4f9d-ba46-2d5e1d393e57",
+			"name": "Chat - Show My Profile",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "48e59779-a0f1-4d52-8827-a26c6db3e509",
+			"name": "Natural Query - Find Team Members",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "794c3a41-b458-4816-97e5-8cf3d3bec02b",
+			"name": "Chat - User Statistics",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "7bb3b057-b75d-4279-b184-76b1601a0be9",
+			"name": "Natural Query - Search Users",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "757da613-0c55-4457-a23c-9a7b2759be64",
+			"name": "Chat - Show Comments for Bug",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "281b8a8e-0aa3-42c3-bafc-3ad03ef9b265",
+			"name": "Natural Query - List Attached Files",
+			"url": "http://localhost:8019/bot/query",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "5db2fdef-35b4-4718-a2ee-53734f9b3d72",
+			"name": "Chat - Recent Comments",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "b7f946a0-68a2-40b2-b9ff-db154d629c38",
+			"name": "Natural Query - File Statistics",
+			"url": "http://localhost:8019/bot/query",
+			"time": 7,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				7
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "067cc034-5168-489b-98b8-acd5bcf76b47",
+			"name": "Chat - Bugs Assigned to Frontend Team",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "ed601b75-952e-4ef9-9fa4-c0e3e8efdbaf",
+			"name": "Natural Query - High Priority Open Bugs This Week",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "96f164fc-dbc8-4c4f-a4f8-c2a9811941d9",
+			"name": "Chat - Team Performance with Bug Resolution",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "81b1dc4d-5776-4a4a-a476-e5df1df3a3f5",
+			"name": "Natural Query - Users with Most Comments on Critical Bugs",
+			"url": "http://localhost:8019/bot/query",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "18a3e98d-0d3d-4421-8aae-32be11a62225",
+			"name": "Chat - Bugs Created Last Month with Comments",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 87,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				87
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "957e7eef-a668-45fc-b48b-63e509b49858",
+			"name": "Natural Query - Recent File Uploads on Open Bugs",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "bb77d0c6-088f-4380-ab36-542b0a197708",
+			"name": "Chat - Complex Boolean Logic",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "d26dff30-2974-417c-ae4e-abecb86e4268",
+			"name": "Natural Query - Similarity Search",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "18cd4dff-a9b2-4399-b022-485793447d3d",
+			"name": "Chat - Comparative Analysis",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "83075fe0-6792-499f-b6e4-54b4e33cc94c",
+			"name": "Natural Query - Cross-Entity Search",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "5cf8ce79-3aaf-4f14-86ab-ac08dbead41f",
+			"name": "Chat - Empty Message",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true,
+				"Status code is 400": false,
+				"Error message present": false
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Status code is 400": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Error message present": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true,
+					"Status code is 400": false,
+					"Error message present": false
+				}
+			]
+		},
+		{
+			"id": "3677d455-1c02-42ca-83d5-164fa0c3e4f3",
+			"name": "Query - Null Query",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true,
+				"Status code is 400": false
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Status code is 400": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true,
+					"Status code is 400": false
+				}
+			]
+		},
+		{
+			"id": "e1e85e74-3116-4f48-b87b-cb7b325443d5",
+			"name": "Chat - No Authentication",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 32,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Response is valid JSON": true,
+				"Status code is 401": false
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Status code is 401": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				32
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true,
+					"Status code is 401": false
+				}
+			]
+		},
+		{
+			"id": "7d30a744-ab44-455e-afff-c63e23ce1bb9",
+			"name": "Chat - Very Long Message",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "01449f3f-6c20-4ebd-890f-60bffc3dd74c",
+			"name": "Query - Invalid JSON",
+			"url": "http://localhost:8019/bot/query",
+			"time": 4,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "211321d3-e413-418f-86ec-ce78f7778bc5",
+			"name": "Chat - SQL Injection Attempt",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "80403d8a-e2af-4d7f-8094-b9765bfd40d6",
+			"name": "Query - XSS Attempt",
+			"url": "http://localhost:8019/bot/query",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "0b1e94bd-52dd-4424-a59a-0ae2af1ac17d",
+			"name": "Chat - Invalid ObjectId",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "2dc8751f-c0e3-4fd4-8962-ac3cb8451f38",
+			"name": "Chat - Large Dataset Query",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true,
+				"Response time is less than 5000ms": true,
+				"Memory usage reasonable": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response time is less than 5000ms": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Memory usage reasonable": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true,
+					"Response time is less than 5000ms": true,
+					"Memory usage reasonable": true
+				}
+			]
+		},
+		{
+			"id": "cad35af9-ef6f-4b09-b62e-f591e330a76a",
+			"name": "Query - Cross-Collection Search",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true,
+				"Response time is reasonable": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response time is reasonable": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true,
+					"Response time is reasonable": true
+				}
+			]
+		},
+		{
+			"id": "81851f7e-5cca-4193-ad28-6eff2909e6a2",
+			"name": "Chat - Complex Analytics Query",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "58b664aa-c288-41f5-a7f4-99f5eb02f6d9",
+			"name": "Health Check",
+			"url": "http://localhost:8019/bot/health",
+			"time": 4,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Response is valid JSON": true,
+				"Status code is 200": true,
+				"Service is running": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Service is running": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true,
+					"Status code is 200": true,
+					"Service is running": true
+				}
+			]
+		},
+		{
+			"id": "a094207d-5d07-42aa-8a58-acbd83f92525",
+			"name": "Get Bug Suggestions",
+			"url": "http://localhost:8019/bot/suggestions?context=bugs&entityType=bug",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "123233a3-cf7a-4f16-a7c2-3fa1a8e3c31a",
+			"name": "Get Team Suggestions",
+			"url": "http://localhost:8019/bot/suggestions?context=teams&entityType=team",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "90391e22-fa9c-43b9-a0e4-38fad7efdd1a",
+			"name": "Get All Suggestions",
+			"url": "http://localhost:8019/bot/suggestions?entityType=all",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "320a65e8-bd71-4881-b823-a12c3d276909",
+			"name": "Get Analytics Suggestions",
+			"url": "http://localhost:8019/bot/suggestions?context=analytics&entityType=analytics",
+			"time": 3,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "5935caa4-89ca-439b-9680-1f4528b54ec4",
+			"name": "Chat - Ambiguous Query",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "9f94417b-0ad9-4b5f-b6ec-830e6d298e28",
+			"name": "Query - Mixed Language Input",
+			"url": "http://localhost:8019/bot/query",
+			"time": 3,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "2190d66c-ebab-4b78-b5a7-96b98f4bf360",
+			"name": "Chat - Numbers and Special Characters",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 6,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				6
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "3a7d4e58-0980-46fe-b89e-30345b95ec10",
+			"name": "Query - Emoji and Unicode",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "3bc9172b-4080-4d67-a7b5-8ded4dddfe92",
+			"name": "Chat - Typos and Misspellings",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "ed6acdc6-3a6f-4d8b-b57c-d9c80aecc4f5",
+			"name": "Concurrent Bug Queries",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "841ded0e-6af3-4723-b534-7b565dcffe5c",
+			"name": "Concurrent Team Queries",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "9ff65c30-f303-466d-a7fa-d9b2193f87a3",
+			"name": "Chat - Date Range Queries",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "4bb5b691-8d89-44b0-ac30-1b287c5f9877",
+			"name": "Query - Timezone Handling",
+			"url": "http://localhost:8019/bot/query",
+			"time": 4,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "fb44120e-7fb7-441d-bf08-0ecdde7847b9",
+			"name": "Chat - Aggregation Queries",
+			"url": "http://localhost:8019/bot/chat",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		},
+		{
+			"id": "a955fcda-3e0d-4bb0-9d93-654caad066ce",
+			"name": "Query - Pagination Test",
+			"url": "http://localhost:8019/bot/query",
+			"time": 5,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response is valid JSON": true
+			},
+			"testPassFailCounts": {
+				"Response is valid JSON": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				5
+			],
+			"allTests": [
+				{
+					"Response is valid JSON": true
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 387,
+	"collection": {
+		"requests": [
+			{
+				"id": "11615e70-4e03-4e3e-b03b-0e43ac5f143a",
+				"method": "POST"
+			},
+			{
+				"id": "bf026599-2e83-47a7-ba22-f9ea3a453cc5",
+				"method": "POST"
+			},
+			{
+				"id": "4d6b7eb0-1163-4969-9463-165957aaa0e1",
+				"method": "POST"
+			},
+			{
+				"id": "5abcb55c-3653-49d0-b912-f4d715fd825d",
+				"method": "POST"
+			},
+			{
+				"id": "54c8a2d4-0f2b-4da6-9337-4d3525dd0178",
+				"method": "POST"
+			},
+			{
+				"id": "a375fca1-637b-45fe-a6e1-e179c9d16be7",
+				"method": "POST"
+			},
+			{
+				"id": "5956b782-0873-4a6e-bae1-3fdcfeb1daa5",
+				"method": "POST"
+			},
+			{
+				"id": "da7d669d-5cde-401e-bd60-25037ad91ece",
+				"method": "POST"
+			},
+			{
+				"id": "3115b1ca-dc0b-478f-a855-966de024d1b5",
+				"method": "POST"
+			},
+			{
+				"id": "c316dae8-cbe2-417f-aaef-67b29d62ef96",
+				"method": "POST"
+			},
+			{
+				"id": "f1b72e31-7144-494f-a796-2a8ee82cbb21",
+				"method": "POST"
+			},
+			{
+				"id": "c71ef789-e450-470c-8fd3-a7e88412d2cc",
+				"method": "POST"
+			},
+			{
+				"id": "1ec87fd0-7d43-4076-9e8d-906599523641",
+				"method": "POST"
+			},
+			{
+				"id": "9fe9a39e-16ba-4f9d-ba46-2d5e1d393e57",
+				"method": "POST"
+			},
+			{
+				"id": "48e59779-a0f1-4d52-8827-a26c6db3e509",
+				"method": "POST"
+			},
+			{
+				"id": "794c3a41-b458-4816-97e5-8cf3d3bec02b",
+				"method": "POST"
+			},
+			{
+				"id": "7bb3b057-b75d-4279-b184-76b1601a0be9",
+				"method": "POST"
+			},
+			{
+				"id": "757da613-0c55-4457-a23c-9a7b2759be64",
+				"method": "POST"
+			},
+			{
+				"id": "281b8a8e-0aa3-42c3-bafc-3ad03ef9b265",
+				"method": "POST"
+			},
+			{
+				"id": "5db2fdef-35b4-4718-a2ee-53734f9b3d72",
+				"method": "POST"
+			},
+			{
+				"id": "b7f946a0-68a2-40b2-b9ff-db154d629c38",
+				"method": "POST"
+			},
+			{
+				"id": "067cc034-5168-489b-98b8-acd5bcf76b47",
+				"method": "POST"
+			},
+			{
+				"id": "ed601b75-952e-4ef9-9fa4-c0e3e8efdbaf",
+				"method": "POST"
+			},
+			{
+				"id": "96f164fc-dbc8-4c4f-a4f8-c2a9811941d9",
+				"method": "POST"
+			},
+			{
+				"id": "81b1dc4d-5776-4a4a-a476-e5df1df3a3f5",
+				"method": "POST"
+			},
+			{
+				"id": "18a3e98d-0d3d-4421-8aae-32be11a62225",
+				"method": "POST"
+			},
+			{
+				"id": "957e7eef-a668-45fc-b48b-63e509b49858",
+				"method": "POST"
+			},
+			{
+				"id": "bb77d0c6-088f-4380-ab36-542b0a197708",
+				"method": "POST"
+			},
+			{
+				"id": "d26dff30-2974-417c-ae4e-abecb86e4268",
+				"method": "POST"
+			},
+			{
+				"id": "18cd4dff-a9b2-4399-b022-485793447d3d",
+				"method": "POST"
+			},
+			{
+				"id": "83075fe0-6792-499f-b6e4-54b4e33cc94c",
+				"method": "POST"
+			},
+			{
+				"id": "5cf8ce79-3aaf-4f14-86ab-ac08dbead41f",
+				"method": "POST"
+			},
+			{
+				"id": "3677d455-1c02-42ca-83d5-164fa0c3e4f3",
+				"method": "POST"
+			},
+			{
+				"id": "e1e85e74-3116-4f48-b87b-cb7b325443d5",
+				"method": "POST"
+			},
+			{
+				"id": "7d30a744-ab44-455e-afff-c63e23ce1bb9",
+				"method": "POST"
+			},
+			{
+				"id": "01449f3f-6c20-4ebd-890f-60bffc3dd74c",
+				"method": "POST"
+			},
+			{
+				"id": "211321d3-e413-418f-86ec-ce78f7778bc5",
+				"method": "POST"
+			},
+			{
+				"id": "80403d8a-e2af-4d7f-8094-b9765bfd40d6",
+				"method": "POST"
+			},
+			{
+				"id": "0b1e94bd-52dd-4424-a59a-0ae2af1ac17d",
+				"method": "POST"
+			},
+			{
+				"id": "2dc8751f-c0e3-4fd4-8962-ac3cb8451f38",
+				"method": "POST"
+			},
+			{
+				"id": "cad35af9-ef6f-4b09-b62e-f591e330a76a",
+				"method": "POST"
+			},
+			{
+				"id": "81851f7e-5cca-4193-ad28-6eff2909e6a2",
+				"method": "POST"
+			},
+			{
+				"id": "58b664aa-c288-41f5-a7f4-99f5eb02f6d9",
+				"method": "GET"
+			},
+			{
+				"id": "a094207d-5d07-42aa-8a58-acbd83f92525",
+				"method": "GET"
+			},
+			{
+				"id": "123233a3-cf7a-4f16-a7c2-3fa1a8e3c31a",
+				"method": "GET"
+			},
+			{
+				"id": "90391e22-fa9c-43b9-a0e4-38fad7efdd1a",
+				"method": "GET"
+			},
+			{
+				"id": "320a65e8-bd71-4881-b823-a12c3d276909",
+				"method": "GET"
+			},
+			{
+				"id": "5935caa4-89ca-439b-9680-1f4528b54ec4",
+				"method": "POST"
+			},
+			{
+				"id": "9f94417b-0ad9-4b5f-b6ec-830e6d298e28",
+				"method": "POST"
+			},
+			{
+				"id": "2190d66c-ebab-4b78-b5a7-96b98f4bf360",
+				"method": "POST"
+			},
+			{
+				"id": "3a7d4e58-0980-46fe-b89e-30345b95ec10",
+				"method": "POST"
+			},
+			{
+				"id": "3bc9172b-4080-4d67-a7b5-8ded4dddfe92",
+				"method": "POST"
+			},
+			{
+				"id": "ed6acdc6-3a6f-4d8b-b57c-d9c80aecc4f5",
+				"method": "POST"
+			},
+			{
+				"id": "841ded0e-6af3-4723-b534-7b565dcffe5c",
+				"method": "POST"
+			},
+			{
+				"id": "9ff65c30-f303-466d-a7fa-d9b2193f87a3",
+				"method": "POST"
+			},
+			{
+				"id": "4bb5b691-8d89-44b0-ac30-1b287c5f9877",
+				"method": "POST"
+			},
+			{
+				"id": "fb44120e-7fb7-441d-bf08-0ecdde7847b9",
+				"method": "POST"
+			},
+			{
+				"id": "a955fcda-3e0d-4bb0-9d93-654caad066ce",
+				"method": "POST"
+			}
+		]
+	}
+}

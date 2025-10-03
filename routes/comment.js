@@ -10,6 +10,8 @@ const {
   updateReply,
   deleteReply,
 } = require("../controller/comment");
+const cache = require("../middleware/redis");
+
 
 const knowWhichRoute = (req, res, next) => {
   console.log("In knowWhichRoute middleware in router");
@@ -25,13 +27,13 @@ const router = express.Router();
 router.route("/create").post(createComment);
 
 // Get comments - requires bugId, team validation handled in controller
-router.route("/all").get(getCommentsForBug);
+router.route("/all").get(cache(600), getCommentsForBug);
 
 // Reply operations - add team membership check via query
 router
   .route("/reply")
   .post(createReplyToComment)
-  .get(knowWhichRoute, getRepliesForComment)
+  .get(knowWhichRoute,cache(600), getRepliesForComment)
   .patch(updateReply)
   .delete(deleteReply);
 
