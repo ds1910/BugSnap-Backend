@@ -5,8 +5,8 @@ const encrypt = require("../service/encrypt");
 const setTokenCookie = require("../utils/setTokenCookie");
 const { autoAcceptInvitations } = require("./people");
 
-const GOOGLE_CLIENT_ID = process.env.Google_Clinet_Id;
-const GOOGLE_CLIENT_SECRET = process.env.Google_Clinet_Secret;
+const GOOGLE_CLIENT_ID = process.env.Google_Client_Id;
+const GOOGLE_CLIENT_SECRET = process.env.Google_Client_Secret;
 const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
 const FRONTEND_URL_MAIN = process.env.FRONTEND_URL_MAIN;
 
@@ -17,6 +17,11 @@ const {
 
 /* --------------------- REDIRECT USER TO GOOGLE --------------------- */
 const handleRedirectToGoogle = (req, res) => {
+  console.log("🔍 handleRedirectToGoogle called");
+  console.log("GOOGLE_CLIENT_ID:", GOOGLE_CLIENT_ID);
+  console.log("GOOGLE_REDIRECT_URI:", GOOGLE_REDIRECT_URI);
+  console.log("Is GOOGLE_CLIENT_ID undefined?", GOOGLE_CLIENT_ID === undefined);
+  
   const googleAuthURL =
     `https://accounts.google.com/o/oauth2/v2/auth?` +
     `client_id=${GOOGLE_CLIENT_ID}` +
@@ -24,6 +29,7 @@ const handleRedirectToGoogle = (req, res) => {
     `&response_type=code` +
     `&scope=openid profile email`;
 
+  console.log("🔗 Generated Google Auth URL:", googleAuthURL);
   res.redirect(googleAuthURL);
 };
 
