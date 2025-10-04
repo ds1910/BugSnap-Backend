@@ -1,24 +1,18 @@
 /**
  * =====================================================
- * PRODUCTION CONSOLE LOG UTILITY
+ * CONSOLE LOG UTILITY
  * =====================================================
  * 
- * This utility provides environment-aware logging for production
- * Use this instead of console.log in production code
+ * This utility provides consistent logging throughout the application
  * =====================================================
  */
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
-
 const logger = {
   /**
-   * Development-only logging
-   * Will only log in development environment
+   * Development logging
    */
   dev: (...args) => {
-    if (isDevelopment) {
-      console.log('[DEV]', ...args);
-    }
+    console.log('[DEV]', ...args);
   },
 
   /**
@@ -46,13 +40,11 @@ const logger = {
   },
 
   /**
-   * Debug logging (development only)
+   * Debug logging
    * Detailed debugging information
    */
   debug: (...args) => {
-    if (isDevelopment) {
-      console.log('[DEBUG]', ...args);
-    }
+    console.log('[DEBUG]', ...args);
   }
 };
 
